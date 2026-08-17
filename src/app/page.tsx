@@ -1,69 +1,68 @@
-import Image from "next/image";
+import Link from "next/link";
+import { vocabulary, categories } from "@/lib/vocabulary";
+
+const features = [
+  { href: "/flashcards", icon: "🃏", title: "Flashcards", desc: "Flip cards to learn Arabic ↔ English. Study by category." },
+  { href: "/phrases", icon: "💬", title: "Common Phrases", desc: "Essential Falahi phrases with transliteration and examples." },
+  { href: "/quiz", icon: "🎯", title: "Quiz", desc: "Test yourself — multiple choice questions on your vocabulary." },
+  { href: "/lessons", icon: "📖", title: "Lessons", desc: "Structured lessons on greetings, family, food, and more." },
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="fade-in">
+      {/* Hero */}
+      <div className="text-center py-12 mb-10 rounded-2xl" style={{ background: "var(--navy)", color: "white" }}>
+        <div className="arabic text-6xl mb-4" style={{ color: "var(--gold-light)" }}>فلاحي</div>
+        <h1 className="text-3xl font-bold mb-3">Learn Falahi Arabic</h1>
+        <p className="text-lg mb-6" style={{ color: "rgba(255,255,255,0.75)" }}>
+          Master the Iraqi &amp; Gulf dialect — flashcards, phrases, quizzes &amp; lessons
+        </p>
+        <Link href="/flashcards" style={{
+          display: "inline-block", padding: "12px 32px", borderRadius: 10,
+          background: "var(--gold)", color: "var(--navy)", fontWeight: 700, fontSize: 16,
+        }}>Start Learning →</Link>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-10">
+        {[
+          { label: "Words", value: vocabulary.length },
+          { label: "Categories", value: categories.length },
+          { label: "Phrases", value: "50+" },
+        ].map(s => (
+          <div key={s.label} className="text-center py-6 rounded-xl" style={{ background: "white", border: "1px solid #e8e0d0" }}>
+            <div className="text-4xl font-bold mb-1" style={{ color: "var(--gold)" }}>{s.value}</div>
+            <div className="text-sm font-medium" style={{ color: "var(--navy)" }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Feature cards */}
+      <div className="grid grid-cols-2 gap-4 mb-10">
+        {features.map(f => (
+          <Link key={f.href} href={f.href} style={{ textDecoration: "none" }}>
+            <div className="p-6 rounded-xl h-full transition-all hover:shadow-md" style={{ background: "white", border: "2px solid #e8e0d0" }}>
+              <div className="text-3xl mb-3">{f.icon}</div>
+              <div className="font-bold text-lg mb-2" style={{ color: "var(--navy)" }}>{f.title}</div>
+              <div className="text-sm" style={{ color: "#666" }}>{f.desc}</div>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Categories */}
+      <div className="rounded-xl p-6" style={{ background: "white", border: "1px solid #e8e0d0" }}>
+        <h2 className="font-bold text-lg mb-4" style={{ color: "var(--navy)" }}>Browse by Category</h2>
+        <div className="flex flex-wrap gap-2">
+          {categories.map(cat => (
+            <Link key={cat} href={`/flashcards?category=${encodeURIComponent(cat)}`} style={{
+              padding: "8px 18px", borderRadius: 999, fontSize: 14, fontWeight: 500,
+              background: "var(--navy)", color: "white", textDecoration: "none",
+            }}>{cat}</Link>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
