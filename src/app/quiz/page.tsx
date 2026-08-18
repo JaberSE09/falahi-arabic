@@ -1,10 +1,9 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { vocabulary } from "@/lib/vocabulary";
+import SpeakButton from "@/components/SpeakButton";
 
-function shuffle<T>(arr: T[]): T[] {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
+function shuffle<T>(arr: T[]): T[] { return [...arr].sort(() => Math.random() - 0.5); }
 
 function getOptions(correct: typeof vocabulary[0], all: typeof vocabulary) {
   const wrong = shuffle(all.filter(w => w.id !== correct.id)).slice(0, 3);
@@ -22,28 +21,22 @@ export default function Quiz() {
 
   const start = useCallback(() => {
     const q = shuffle(vocabulary).slice(0, 10);
-    setQuestions(q);
-    setCurrent(0);
-    setScore(0);
-    setDone(false);
-    setSelected(null);
+    setQuestions(q); setCurrent(0); setScore(0);
+    setDone(false); setSelected(null);
     setOptions(getOptions(q[0], vocabulary));
   }, []);
 
   useEffect(() => { start(); }, [start]);
-
-  useEffect(() => {
-    if (questions[current]) setOptions(getOptions(questions[current], vocabulary));
-  }, [current, questions]);
+  useEffect(() => { if (questions[current]) setOptions(getOptions(questions[current], vocabulary)); }, [current, questions]);
 
   const handleAnswer = (opt: typeof vocabulary[0]) => {
     if (selected !== null) return;
     setSelected(opt.id);
     if (opt.id === questions[current].id) setScore(s => s + 1);
     setTimeout(() => {
-      if (current + 1 >= questions.length) { setDone(true); }
+      if (current + 1 >= questions.length) setDone(true);
       else { setCurrent(c => c + 1); setSelected(null); }
-    }, 1200);
+    }, 1400);
   };
 
   if (!questions.length) return null;
@@ -54,15 +47,11 @@ export default function Quiz() {
       <h2 className="text-3xl font-bold mb-2" style={{ color: "var(--navy)" }}>Quiz Complete!</h2>
       <div className="text-5xl font-bold mb-2" style={{ color: "var(--gold)" }}>{score} / {questions.length}</div>
       <p className="mb-8" style={{ color: "#666" }}>
-        {score === 10 ? "Perfect! Mashallah! 🌟" : score >= 7 ? "Great job! Keep it up! 💪" : "Keep practicing — you'll get there! 📚"}
+        {score === 10 ? "Perfect! Mashallah! 🌟" : score >= 7 ? "Great job! 💪" : "Keep practicing! 📚"}
       </p>
       <div className="flex gap-3 justify-center">
-        <button onClick={start} style={{ padding: "12px 28px", borderRadius: 10, background: "var(--navy)", color: "white", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}>
-          Try Again
-        </button>
-        <button onClick={() => setMode(m => m === "arToEn" ? "enToAr" : "arToEn")} style={{ padding: "12px 28px", borderRadius: 10, background: "white", color: "var(--navy)", fontWeight: 700, fontSize: 15, border: "2px solid var(--navy)", cursor: "pointer" }}>
-          Switch Mode
-        </button>
+        <button onClick={start} style={{ padding: "12px 28px", borderRadius: 10, background: "var(--navy)", color: "white", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}>Try Again</button>
+        <button onClick={() => { setMode(m => m === "arToEn" ? "enToAr" : "arToEn"); start(); }} style={{ padding: "12px 28px", borderRadius: 10, background: "white", color: "var(--navy)", fontWeight: 700, fontSize: 15, border: "2px solid var(--navy)", cursor: "pointer" }}>Switch Mode</button>
       </div>
     </div>
   );
@@ -74,8 +63,8 @@ export default function Quiz() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold" style={{ color: "var(--navy)" }}>Quiz</h1>
         <div className="flex gap-2">
-          {["arToEn", "enToAr"].map(m => (
-            <button key={m} onClick={() => { setMode(m as typeof mode); start(); }} style={{
+          {(["arToEn", "enToAr"] as const).map(m => (
+            <button key={m} onClick={() => { setMode(m); start(); }} style={{
               padding: "6px 14px", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer",
               background: mode === m ? "var(--navy)" : "white",
               color: mode === m ? "white" : "var(--navy)",
@@ -99,12 +88,16 @@ export default function Quiz() {
         <div className="text-xs font-medium mb-3" style={{ color: "rgba(255,255,255,0.5)", letterSpacing: 2 }}>
           {mode === "arToEn" ? "WHAT DOES THIS MEAN?" : "HOW DO YOU SAY..."}
         </div>
-        {mode === "arToEn"
-          ? <div className="arabic text-6xl" style={{ color: "var(--gold-light)" }}>{word.arabic}</div>
-          : <div className="text-3xl font-bold" style={{ color: "white" }}>{word.english}</div>
-        }
-        {mode === "arToEn" && (
-          <div className="mt-3 text-sm italic" style={{ color: "rgba(255,255,255,0.5)" }}>{word.transliteration}</div>
+        {mode === "arToEn" ? (
+          <>
+            <div className="arabic text-6xl mb-3" style={{ color: "var(--gold-light)" }}>{word.arabic}</div>
+            <div className="flex items-center justify-center gap-3">
+              <SpeakButton text={word.arabic} size="lg" />
+              <span className="text-sm italic" style={{ color: "rgba(255,255,255,0.5)" }}>{word.transliteration}</span>
+            </div>
+          </>
+        ) : (
+          <div className="text-3xl font-bold" style={{ color: "white" }}>{word.english}</div>
         )}
       </div>
 
@@ -126,7 +119,12 @@ export default function Quiz() {
             }}>
               {mode === "arToEn"
                 ? opt.english
-                : <span className="arabic text-2xl">{opt.arabic}</span>
+                : (
+                  <div className="flex items-center justify-center gap-2">
+                    <SpeakButton text={opt.arabic} size="sm" />
+                    <span className="arabic text-2xl">{opt.arabic}</span>
+                  </div>
+                )
               }
             </button>
           );
