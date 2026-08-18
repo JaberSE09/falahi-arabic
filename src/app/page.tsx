@@ -16,7 +16,7 @@ export default function Home() {
         <div className="arabic text-6xl mb-4" style={{ color: "var(--gold-light)" }}>فلاحي</div>
         <h1 className="text-3xl font-bold mb-3">Learn Falahi Arabic</h1>
         <p className="text-lg mb-6" style={{ color: "rgba(255,255,255,0.75)" }}>
-          Master the Iraqi &amp; Gulf dialect — flashcards, phrases, quizzes &amp; lessons
+          Master the Palestinian dialect — flashcards, phrases, quizzes &amp; lessons
         </p>
         <Link href="/flashcards" style={{
           display: "inline-block", padding: "12px 32px", borderRadius: 10,

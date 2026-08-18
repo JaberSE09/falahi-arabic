@@ -3,8 +3,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Falahi Arabic — Learn Iraqi/Gulf Arabic",
-  description: "Interactive flashcards, phrases, and lessons to learn Falahi (Iraqi/Gulf) Arabic dialect.",
+  title: "Falahi Arabic — Learn Palestinian Arabic",
+  description: "Interactive flashcards, phrases, and lessons to learn Falahi (Palestinian) Arabic dialect.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

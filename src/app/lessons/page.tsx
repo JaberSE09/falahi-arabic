@@ -3,38 +3,44 @@ import Link from "next/link";
 const lessons = [
   {
     id: 1, title: "Greetings & Introductions", emoji: "👋", level: "Beginner",
-    desc: "Learn how to greet people in Falahi Arabic — hello, goodbye, how are you, and common responses.",
-    topics: ["هلا — Hello", "شلونك — How are you?", "بخير — Fine", "مع السلامة — Goodbye", "صباح الخير — Good morning"],
+    desc: "Learn how to greet people in Palestinian Arabic — مرحبا, كيفك, and how to respond naturally.",
+    topics: ["مرحبا — Hello", "كيفك — How are you?", "منيح — Fine", "مع السلامة — Goodbye", "صباح الخير — Good morning"],
     category: "Greetings",
   },
   {
     id: 2, title: "Family Members", emoji: "👨‍👩‍👧‍👦", level: "Beginner",
-    desc: "Learn the words for immediate and extended family members in Falahi dialect.",
-    topics: ["أمي — My mother", "أبوي — My father", "أخوي — My brother", "أختي — My sister", "جدي / جدتي — Grandparents"],
+    desc: "Learn immediate and extended family words in Palestinian dialect.",
+    topics: ["أمّي — My mother", "أبوي — My father", "أخوي — My brother", "أختي — My sister", "جدّو / تتّا — Grandparents"],
     category: "Family",
   },
   {
-    id: 3, title: "Food & Drinks", emoji: "🍽️", level: "Beginner",
-    desc: "Essential food and drink vocabulary — perfect for markets, restaurants, and home.",
-    topics: ["ماي — Water", "چاي — Tea", "خبز — Bread", "رز — Rice", "تمر — Dates"],
+    id: 3, title: "Food & Palestinian Cuisine", emoji: "🥙", level: "Beginner",
+    desc: "Essential food and drink vocabulary — perfect for family meals, markets, and restaurants.",
+    topics: ["مي — Water", "شاي — Tea", "خبز — Bread", "حمّص — Hummus", "زيت وزعتر — Za'atar & olive oil"],
     category: "Food & Drink",
   },
   {
-    id: 4, title: "Numbers 1–10", emoji: "🔢", level: "Beginner",
-    desc: "Count in Falahi Arabic from one to ten. Essential for shopping, time, and daily life.",
-    topics: ["واحد — One", "ثنين — Two", "ثلاثة — Three", "أربعة — Four", "خمسة — Five"],
+    id: 4, title: "Numbers 1–20", emoji: "🔢", level: "Beginner",
+    desc: "Count in Palestinian Arabic. Numbers sound slightly different from MSA — learn the dialect forms.",
+    topics: ["واحد — One", "اثنين — Two (Itnēn not Ithnān)", "ثلاثة — Three (Tlāte)", "عشرة — Ten (ʿAshra)", "عشرين — Twenty"],
     category: "Numbers",
   },
   {
-    id: 5, title: "Common Phrases", emoji: "💬", level: "Beginner",
-    desc: "The most useful everyday phrases — thank you, sorry, please, I want, I don't know.",
-    topics: ["شكراً — Thank you", "آسف — Sorry", "زين — Good/OK", "أريد — I want", "ما أدري — I don't know"],
+    id: 5, title: "Essential Question Words", emoji: "❓", level: "Beginner",
+    desc: "The key question words in Palestinian dialect — شو، وين، ليش، كيف، إيمتى. These are different from MSA.",
+    topics: ["شو — What", "وين — Where", "ليش — Why", "كيف — How", "إيمتى — When"],
     category: "Phrases",
   },
   {
-    id: 6, title: "Colors", emoji: "🎨", level: "Beginner",
-    desc: "Learn colors in Arabic — useful for describing objects, clothes, and surroundings.",
-    topics: ["أحمر — Red", "أزرق — Blue", "أخضر — Green", "أبيض — White", "أسود — Black"],
+    id: 6, title: "Daily Life & Getting Around", emoji: "🏘️", level: "Beginner",
+    desc: "Words you'll use every day — home, work, market, transport, and essential commands like يلّا.",
+    topics: ["يلّا — Let's go!", "بيت — Home", "شغل — Work", "سوق — Market", "دكان — Shop"],
+    category: "Daily Life",
+  },
+  {
+    id: 7, title: "Colors", emoji: "🎨", level: "Beginner",
+    desc: "Colors in Palestinian Arabic — useful for describing clothes, objects, and surroundings.",
+    topics: ["أحمر — Red", "أزرق — Blue", "أخضر — Green", "أبيض — White", "وردي — Pink"],
     category: "Colors",
   },
 ];
@@ -49,7 +55,7 @@ export default function Lessons() {
   return (
     <div className="fade-in">
       <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--navy)" }}>Lessons</h1>
-      <p className="text-sm mb-8" style={{ color: "#666" }}>Structured lessons to build your Falahi Arabic foundation</p>
+      <p className="text-sm mb-8" style={{ color: "#666" }}>Structured lessons in authentic Palestinian dialect</p>
 
       <div className="grid grid-cols-1 gap-4">
         {lessons.map((lesson, i) => (
@@ -87,12 +93,11 @@ export default function Lessons() {
         ))}
       </div>
 
-      {/* Coming soon */}
       <div className="mt-8 p-6 rounded-xl text-center" style={{ background: "var(--navy)", color: "white" }}>
         <div className="text-2xl mb-2">🚧</div>
         <div className="font-bold mb-1">More lessons coming soon</div>
         <div className="text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
-          Intermediate topics: verbs, sentence structure, past/present tense, shopping, directions
+          Intermediate: verbs, sentence structure, past tense, shopping phrases, expressions & proverbs
         </div>
       </div>
     </div>
