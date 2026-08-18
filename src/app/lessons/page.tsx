@@ -57,7 +57,7 @@ export default function Lessons() {
       <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--navy)" }}>Lessons</h1>
       <p className="text-sm mb-8" style={{ color: "#666" }}>Structured lessons in authentic Palestinian dialect</p>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {lessons.map((lesson, i) => (
           <div key={lesson.id} className="rounded-xl p-6" style={{ background: "white", border: "1px solid #e8e0d0" }}>
             <div className="flex items-start gap-4">

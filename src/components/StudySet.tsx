@@ -36,7 +36,7 @@ function FlashcardMode({ cards }: { cards: StudyCard[] }) {
       </div>
 
       {/* card */}
-      <div className="w-full cursor-pointer" style={{ maxWidth: 560, height: 340, perspective: "1000px" }} onClick={() => setFlipped(f => !f)}>
+      <div className="w-full cursor-pointer" style={{ maxWidth: 560, height: "min(340px, 58vw)", perspective: "1000px" }} onClick={() => setFlipped(f => !f)}>
         <div style={{ position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d", transition: "transform 0.55s", transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}>
           {/* front */}
           <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 20, background: "var(--navy)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32, textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.15)" }}>
@@ -129,7 +129,7 @@ function LearnMode({ cards }: { cards: StudyCard[] }) {
         )}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12 }}>
         {options.map(opt => {
           const isCorrect = opt.id===correct.id;
           const isSel = selected===opt.id;
@@ -207,7 +207,7 @@ function MatchMode({ cards }: { cards: StudyCard[] }) {
       ) : (
         <>
           <p style={{ textAlign: "center", color: "#888", fontSize: 13, marginBottom: 20 }}>Match each Arabic with its English — tap one from each side</p>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {leftItems.map(c => (
                 <button key={c.id} onClick={() => pickLeft(c.id)} style={btnStyle(c.id, "left")}>

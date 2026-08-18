@@ -56,7 +56,7 @@ export default function HadithPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {filtered.map(h => (
             <div key={h.id} style={{ background: "white", borderRadius: 16, padding: "20px 24px", border: "1px solid #e8e0d0" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                   <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 999, background: "var(--navy)", color: "var(--gold-light)" }}>{h.topic}</span>
                   <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 999, background: "#f0ebe0", color: "#666" }}>{h.source}</span>

@@ -9,31 +9,26 @@ export default function Phrases() {
 
   return (
     <div className="fade-in">
-      <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--navy)" }}>Phrases & Vocabulary</h1>
-      <p className="text-sm mb-8" style={{ color: "#666" }}>Tap 🔊 on any word to hear it spoken in Falahi Arabic</p>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--navy)", marginBottom: 4 }}>Phrases & Vocabulary</h1>
+      <p style={{ fontSize: 13, color: "#888", marginBottom: 24 }}>Tap 🔊 to hear any word in Palestinian Arabic</p>
 
       {Object.entries(grouped).map(([cat, words]) => (
-        <div key={cat} className="mb-8 rounded-xl overflow-hidden" style={{ border: "1px solid #e8e0d0" }}>
-          <div className="px-5 py-3 font-bold text-sm" style={{ background: "var(--navy)", color: "var(--gold-light)", letterSpacing: 1 }}>
+        <div key={cat} style={{ marginBottom: 24, borderRadius: 16, overflow: "hidden", border: "1px solid #e8e0d0" }}>
+          <div style={{ padding: "12px 18px", fontWeight: 700, fontSize: 13, letterSpacing: 1, background: "var(--navy)", color: "var(--gold-light)" }}>
             {cat.toUpperCase()} — {words.length} words
           </div>
           <div style={{ background: "white" }}>
             {words.map((w, i) => (
-              <div key={w.id} className="flex items-center gap-4 px-5 py-4" style={{
-                borderTop: i > 0 ? "1px solid #f0ebe0" : "none",
-              }}>
-                {/* Speak button */}
+              <div key={w.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderTop: i>0?"1px solid #f5f0e8":"none" }}>
                 <SpeakButton text={w.arabic} size="md" />
-                {/* Arabic */}
-                <div className="arabic text-3xl w-24 text-right flex-shrink-0" style={{ color: "var(--navy)" }}>{w.arabic}</div>
-                {/* Info */}
-                <div className="flex-1">
-                  <div className="font-semibold" style={{ color: "var(--navy)" }}>{w.english}</div>
-                  <div className="text-sm italic" style={{ color: "var(--gold)" }}>{w.transliteration}</div>
+                <div className="arabic" style={{ fontSize: 24, color: "var(--navy)", minWidth: 70, textAlign: "right", flexShrink: 0 }}>{w.arabic}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: "var(--navy)" }}>{w.english}</div>
+                  <div style={{ fontSize: 12, fontStyle: "italic", color: "var(--gold)" }}>{w.transliteration}</div>
                   {w.example && (
-                    <div className="mt-1 flex items-center gap-2">
+                    <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 6 }}>
                       <SpeakButton text={w.example} size="sm" />
-                      <span className="text-xs" style={{ color: "#888" }}>
+                      <span style={{ fontSize: 11, color: "#999" }}>
                         <span className="arabic">{w.example}</span> — {w.exampleTranslation}
                       </span>
                     </div>

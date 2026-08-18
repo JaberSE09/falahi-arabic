@@ -44,7 +44,7 @@ export default function DuaPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {duas.map(d => (
             <div key={d.id} style={{ background: "white", borderRadius: 16, padding: "20px 24px", border: "1px solid #e8e0d0" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 15, color: "var(--navy)", marginBottom: 3 }}>{d.title}</div>
                   <div style={{ display: "flex", gap: 6 }}>

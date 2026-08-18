@@ -57,7 +57,7 @@ export default function QuranPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {filtered.map(v => (
             <div key={v.id} style={{ background: "white", borderRadius: 16, padding: "20px 24px", border: "1px solid #e8e0d0", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
                 <div style={{ display: "flex", gap: 8 }}>
                   <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 999, background: "var(--navy)", color: "var(--gold-light)" }}>
                     {v.surahEn} : {v.ayah}
