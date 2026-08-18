@@ -54,11 +54,11 @@ export default function DuaPage() {
                 </div>
                 <SpeakButton text={d.arabic} size="md" />
               </div>
-              <div className="arabic" style={{ fontSize: 24, lineHeight: 2, color: "var(--navy)", textAlign: "right", direction: "rtl", marginBottom: 12 }}>
+              <div className="arabic" style={{ fontSize: 32, lineHeight: 2.2, color: "var(--navy)", textAlign: "right", direction: "rtl", marginBottom: 12 }}>
                 {d.arabic}
               </div>
-              <div style={{ fontSize: 13, fontStyle: "italic", color: "var(--gold)", marginBottom: 6 }}>{d.transliteration}</div>
-              <div style={{ fontSize: 14, color: "#333" }}>{d.english}</div>
+              <div style={{ fontSize: 16, fontStyle: "italic", color: "var(--gold)", marginBottom: 6 }}>{d.transliteration}</div>
+              <div style={{ fontSize: 17, color: "#222" }}>{d.english}</div>
             </div>
           ))}
         </div>

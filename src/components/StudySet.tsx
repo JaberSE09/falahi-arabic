@@ -41,7 +41,7 @@ function FlashcardMode({ cards }: { cards: StudyCard[] }) {
           {/* front */}
           <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 20, background: "var(--navy)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32, textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.15)" }}>
             {card.badge && <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, color: "var(--gold)", marginBottom: 12 }}>{card.badge.toUpperCase()}</span>}
-            <div className="arabic" style={{ fontSize: 36, lineHeight: 1.6, color: "var(--gold-light)", marginBottom: 16, maxWidth: 460 }}>{card.arabic}</div>
+            <div className="arabic" style={{ fontSize: 44, lineHeight: 1.6, color: "var(--gold-light)", marginBottom: 16, maxWidth: 460 }}>{card.arabic}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <SpeakButton text={card.arabic} size="md" />
               <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", fontStyle: "italic" }}>tap to reveal</span>
@@ -49,8 +49,8 @@ function FlashcardMode({ cards }: { cards: StudyCard[] }) {
           </div>
           {/* back */}
           <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateY(180deg)", borderRadius: 20, background: "var(--gold)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32, textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.15)" }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: "var(--navy)", marginBottom: 6 }}>{card.english}</div>
-            <div style={{ fontSize: 14, fontStyle: "italic", color: "var(--navy-light)", marginBottom: 10 }}>{card.transliteration}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "var(--navy)", marginBottom: 8 }}>{card.english}</div>
+            <div style={{ fontSize: 17, fontStyle: "italic", color: "var(--navy-light)", marginBottom: 12 }}>{card.transliteration}</div>
             {card.subtitle && <div style={{ fontSize: 12, color: "rgba(0,0,0,0.45)", marginBottom: 8 }}>{card.subtitle}</div>}
             {card.note && <div style={{ fontSize: 12, padding: "8px 14px", borderRadius: 10, background: "rgba(255,255,255,0.4)", color: "var(--navy)" }}>💡 {card.note}</div>}
             <div style={{ marginTop: 10 }}>
@@ -125,7 +125,7 @@ function LearnMode({ cards }: { cards: StudyCard[] }) {
             </div>
           </>
         ) : (
-          <div style={{ fontSize: 22, fontWeight: 700, color: "white" }}>{correct.english}</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: "white" }}>{correct.english}</div>
         )}
       </div>
 

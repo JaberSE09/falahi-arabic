@@ -68,11 +68,11 @@ export default function QuranPage() {
                 </div>
                 <SpeakButton text={v.arabic} size="md" />
               </div>
-              <div className="arabic" style={{ fontSize: 28, lineHeight: 2, color: "var(--navy)", textAlign: "right", direction: "rtl", marginBottom: 12, fontWeight: 400 }}>
+              <div className="arabic" style={{ fontSize: 34, lineHeight: 2.2, color: "var(--navy)", textAlign: "right", direction: "rtl", marginBottom: 12, fontWeight: 400 }}>
                 {v.arabic}
               </div>
-              <div style={{ fontSize: 14, fontStyle: "italic", color: "var(--gold)", marginBottom: 6 }}>{v.transliteration}</div>
-              <div style={{ fontSize: 15, color: "#333" }}>{v.english}</div>
+              <div style={{ fontSize: 17, fontStyle: "italic", color: "var(--gold)", marginBottom: 6 }}>{v.transliteration}</div>
+              <div style={{ fontSize: 17, color: "#222" }}>{v.english}</div>
               {v.note && <div style={{ marginTop: 10, fontSize: 12, color: "#888", padding: "6px 12px", background: "#f9f6f0", borderRadius: 8 }}>💡 {v.note}</div>}
             </div>
           ))}

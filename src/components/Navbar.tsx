@@ -45,7 +45,7 @@ export default function Navbar() {
                 <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", marginRight: 8, marginLeft: si > 0 ? 12 : 0 }}>{sec.label}</span>
                 {sec.links.map(l => (
                   <Link key={l.href} href={l.href} style={{
-                    padding: "6px 12px", borderRadius: 8, fontSize: 13, fontWeight: 600,
+                    padding: "6px 12px", borderRadius: 8, fontSize: 15, fontWeight: 700,
                     color: path === l.href ? "var(--navy)" : "rgba(255,255,255,0.8)",
                     background: path === l.href ? "var(--gold)" : "transparent",
                     textDecoration: "none", transition: "all 0.15s",

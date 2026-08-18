@@ -1,17 +1,19 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --gold: #C9963A;
-  --gold-light: #F0C060;
-  --navy: #1A2744;
-  --navy-light: #243460;
-  --cream: #FDF8F0;
-  --green: #2D7A4F;
+  --gold: #B8860B;
+  --gold-light: #F5C842;
+  --navy: #0F1E3D;
+  --navy-light: #1A2F5A;
+  --cream: #FEFCF6;
+  --green: #1A5C35;
 }
 
 * { box-sizing: border-box; }
+
+html { font-size: 18px; }
 
 body {
   font-family: 'Inter', sans-serif;
@@ -19,11 +21,18 @@ body {
   color: var(--navy);
   margin: 0;
   padding: 0;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* All base text bigger */
+p, li, span, div { font-size: inherit; }
+button { font-size: 1rem; }
 
 .arabic {
   font-family: 'Amiri', serif;
   direction: rtl;
+  line-height: 2;
 }
 
 @keyframes fadeIn {
@@ -41,7 +50,14 @@ body {
   .show-mobile   { display: flex !important; }
 }
 
+/* Focus ring for accessibility */
+button:focus-visible, a:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #bbb; border-radius: 3px; }
