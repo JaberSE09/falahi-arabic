@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap');
-
 :root {
   --gold: #B8860B;
   --gold-light: #F5C842;
@@ -16,7 +14,7 @@
 html { font-size: 18px; }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
   background: var(--cream);
   color: var(--navy);
   margin: 0;
@@ -30,7 +28,7 @@ p, li, span, div { font-size: inherit; }
 button { font-size: 1rem; }
 
 .arabic {
-  font-family: 'Amiri', serif;
+  font-family: var(--font-amiri), serif;
   direction: rtl;
   line-height: 2;
 }

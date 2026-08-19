@@ -21,7 +21,13 @@ function FlashCard({ word, onNext, onPrev, index, total }: {
       </div>
 
       {/* Card */}
-      <div onClick={() => setFlipped(f => !f)} style={{ width: "100%", maxWidth: 520, height: "min(320px, 60vw)", perspective: 1000, cursor: "pointer" }}>
+      <div
+        onClick={(e) => {
+          if (e.target instanceof Element && e.target.closest("button")) return;
+          setFlipped(f => !f);
+        }}
+        style={{ width: "100%", maxWidth: 520, height: "min(320px, 60vw)", perspective: 1000, cursor: "pointer" }}
+      >
         <div style={{ position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d", transition: "transform 0.55s", transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}>
           {/* Front */}
           <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 22, background: "var(--navy)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 28, textAlign: "center" }}>
