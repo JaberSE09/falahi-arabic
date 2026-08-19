@@ -1,10 +1,49 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, type SyntheticEvent } from "react";
 
 interface SpeakButtonProps {
   text: string;
   size?: "sm" | "md" | "lg";
   className?: string;
+}
+
+async function speakWithBrowser(text: string): Promise<void> {
+  if (typeof window === "undefined" || !window.speechSynthesis) {
+    throw new Error("Speech not supported");
+  }
+
+  const arabicVoice = window.speechSynthesis
+    .getVoices()
+    .find((voice) => voice.lang.toLowerCase().startsWith("ar"));
+
+  await new Promise<void>((resolve, reject) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = arabicVoice?.lang ?? "ar-SA";
+    utterance.rate = 0.85;
+    if (arabicVoice) utterance.voice = arabicVoice;
+    utterance.onend = finish;
+    utterance.onerror = (event) => {
+      if (event.error === "interrupted" || event.error === "canceled") {
+        finish();
+        return;
+      }
+      if (!settled) {
+        settled = true;
+        reject(new Error("Browser speech failed"));
+      }
+    };
+    window.speechSynthesis.speak(utterance);
+    window.speechSynthesis.resume();
+    window.setTimeout(finish, Math.max(2500, text.length * 220));
+  });
 }
 
 export default function SpeakButton({ text, size = "md", className = "" }: SpeakButtonProps) {
@@ -29,25 +68,62 @@ export default function SpeakButton({ text, size = "md", className = "" }: Speak
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       });
-      if (!res.ok) throw new Error("TTS failed");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const audio = new Audio(url);
+
+      if (res.ok) {
+        const blob = await res.blob();
+        if (blob.size > 0) {
+          const url = URL.createObjectURL(blob);
+          const audio = new Audio(url);
+          setLoading(false);
+          setPlaying(true);
+          await new Promise<void>((resolve, reject) => {
+            audio.onended = () => {
+              URL.revokeObjectURL(url);
+              resolve();
+            };
+            audio.onerror = () => {
+              URL.revokeObjectURL(url);
+              reject(new Error("Audio failed"));
+            };
+            void audio.play().catch(reject);
+          });
+          return;
+        }
+      }
+
       setLoading(false);
       setPlaying(true);
-      audio.onended = () => { setPlaying(false); URL.revokeObjectURL(url); };
-      audio.onerror = () => { setPlaying(false); setError(true); URL.revokeObjectURL(url); };
-      await audio.play();
+      await speakWithBrowser(text);
     } catch {
+      try {
+        setLoading(false);
+        setPlaying(true);
+        await speakWithBrowser(text);
+      } catch {
+        setError(true);
+        setTimeout(() => setError(false), 2000);
+      }
+    } finally {
       setLoading(false);
-      setError(true);
-      setTimeout(() => setError(false), 2000);
+      setPlaying(false);
     }
   }, [text, loading, playing]);
 
+  const haltCardFlip = (e: SyntheticEvent) => {
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+  };
+
   return (
     <button
-      onClick={speak}
+      type="button"
+      aria-label={`Listen: ${text}`}
+      onPointerDown={haltCardFlip}
+      onMouseDown={haltCardFlip}
+      onClick={(e) => {
+        haltCardFlip(e);
+        void speak();
+      }}
       title={`Listen: ${text}`}
       className={className}
       style={{
@@ -55,9 +131,11 @@ export default function SpeakButton({ text, size = "md", className = "" }: Speak
         display: "inline-flex", alignItems: "center", justifyContent: "center",
         border: "none", cursor: loading || playing ? "default" : "pointer",
         flexShrink: 0,
+        position: "relative",
+        zIndex: 5,
         background: error ? "#e85d75" : playing ? "var(--green)" : loading ? "var(--gold)" : "var(--navy)",
         transition: "background 0.2s, transform 0.1s",
-        transform: playing ? "scale(1.1)" : "scale(1)",
+        transform: playing ? "translateZ(24px) scale(1.1)" : "translateZ(24px)",
         boxShadow: playing ? "0 0 0 4px rgba(45,122,79,0.25)" : "none",
       }}
     >
@@ -67,7 +145,6 @@ export default function SpeakButton({ text, size = "md", className = "" }: Speak
           <style>{`@keyframes spin { to { transform: rotate(360deg); transform-origin: center; } }`}</style>
         </svg>
       ) : playing ? (
-        // Sound waves icon
         <svg width={s.icon} height={s.icon} viewBox="0 0 24 24" fill="white">
           <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
           <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
@@ -77,7 +154,6 @@ export default function SpeakButton({ text, size = "md", className = "" }: Speak
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
         </svg>
       ) : (
-        // Speaker icon
         <svg width={s.icon} height={s.icon} viewBox="0 0 24 24" fill="white">
           <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
         </svg>

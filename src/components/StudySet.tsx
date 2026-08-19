@@ -36,7 +36,14 @@ function FlashcardMode({ cards }: { cards: StudyCard[] }) {
       </div>
 
       {/* card */}
-      <div className="w-full cursor-pointer" style={{ maxWidth: 560, height: "min(340px, 58vw)", perspective: "1000px" }} onClick={() => setFlipped(f => !f)}>
+      <div
+        className="w-full cursor-pointer"
+        style={{ maxWidth: 560, height: "min(340px, 58vw)", perspective: "1000px" }}
+        onClick={(e) => {
+          if (e.target instanceof Element && e.target.closest("button")) return;
+          setFlipped(f => !f);
+        }}
+      >
         <div style={{ position: "relative", width: "100%", height: "100%", transformStyle: "preserve-3d", transition: "transform 0.55s", transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}>
           {/* front */}
           <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 20, background: "var(--navy)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32, textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.15)" }}>
