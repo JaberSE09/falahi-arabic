@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { vocabulary } from "@/lib/vocabulary";
 import { quranVerses, duas, hadiths } from "@/lib/islamic";
+import ProgressHint from "@/components/ProgressHint";
 
 const palestinianFeatures = [
-  { href: "/flashcards", icon: "🃏", title: "Flashcards", desc: "Flip cards — Arabic to English, study by category" },
+  { href: "/flashcards", icon: "🃏", title: "Flashcards", desc: "Swipe right if you know, left if you don’t" },
   { href: "/phrases",    icon: "💬", title: "Phrases",    desc: "All words with pronunciation guide" },
-  { href: "/quiz",       icon: "🎯", title: "Quiz",       desc: "Multiple choice, Arabic ↔ English" },
+  { href: "/quiz",       icon: "🎯", title: "Quiz",       desc: "Multiple choice, including My gaps" },
+  { href: "/games",      icon: "🎮", title: "Games",      desc: "Match, speed round, and listen & pick" },
   { href: "/lessons",    icon: "📖", title: "Lessons",    desc: "7 structured beginner lessons" },
 ];
 
@@ -20,7 +22,7 @@ export default function Home() {
     <div className="fade-in">
       {/* Hero */}
       <div style={{ textAlign: "center", padding: "44px 24px 40px", marginBottom: 28, borderRadius: 24, background: "var(--navy)", color: "white" }}>
-        <div className="arabic" style={{ fontSize: 64, color: "var(--gold-light)", marginBottom: 10 }}>فلاحي</div>
+        <div className="arabic" style={{ fontSize: "clamp(72px, 18vw, 96px)", color: "var(--gold-light)", marginBottom: 10, lineHeight: 1.3 }}>فلاحي</div>
         <h1 style={{ fontSize: "clamp(24px, 6vw, 34px)", fontWeight: 800, marginBottom: 12, margin: "0 0 12px", lineHeight: 1.3 }}>Learn Arabic — Two Ways</h1>
         <p style={{ fontSize: "clamp(16px, 3vw, 20px)", color: "rgba(255,255,255,0.8)", marginBottom: 28, lineHeight: 1.6, maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
           Palestinian dialect for daily life · Quranic Arabic for Islamic learning
@@ -45,6 +47,8 @@ export default function Home() {
           </div>
         ))}
       </div>
+
+      <ProgressHint />
 
       {/* Palestinian section */}
       <div style={{ marginBottom: 32 }}>

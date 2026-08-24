@@ -38,7 +38,7 @@ function FlashcardMode({ cards }: { cards: StudyCard[] }) {
       {/* card */}
       <div
         className="w-full cursor-pointer"
-        style={{ maxWidth: 560, height: "min(340px, 58vw)", perspective: "1000px" }}
+        style={{ maxWidth: 560, height: "min(420px, 72vw)", perspective: "1000px" }}
         onClick={(e) => {
           if (e.target instanceof Element && e.target.closest("button")) return;
           setFlipped(f => !f);
@@ -48,7 +48,7 @@ function FlashcardMode({ cards }: { cards: StudyCard[] }) {
           {/* front */}
           <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", borderRadius: 20, background: "var(--navy)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32, textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.15)" }}>
             {card.badge && <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, color: "var(--gold)", marginBottom: 12 }}>{card.badge.toUpperCase()}</span>}
-            <div className="arabic" style={{ fontSize: 44, lineHeight: 1.6, color: "var(--gold-light)", marginBottom: 16, maxWidth: 460 }}>{card.arabic}</div>
+            <div className="arabic" style={{ fontSize: 64, lineHeight: 1.6, color: "var(--gold-light)", marginBottom: 16, maxWidth: 460 }}>{card.arabic}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <SpeakButton text={card.arabic} size="md" />
               <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", fontStyle: "italic" }}>tap to reveal</span>
@@ -125,7 +125,7 @@ function LearnMode({ cards }: { cards: StudyCard[] }) {
       <div style={{ borderRadius: 20, background: "var(--navy)", padding: "32px 24px", textAlign: "center", marginBottom: 20, boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
         {direction==="arToEn" ? (
           <>
-            <div className="arabic" style={{ fontSize: 34, color: "var(--gold-light)", lineHeight: 1.6, marginBottom: 12 }}>{correct.arabic}</div>
+            <div className="arabic" style={{ fontSize: 52, color: "var(--gold-light)", lineHeight: 1.6, marginBottom: 12 }}>{correct.arabic}</div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
               <SpeakButton text={correct.arabic} size="md" />
               <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", fontStyle: "italic" }}>{correct.transliteration}</span>
@@ -150,7 +150,7 @@ function LearnMode({ cards }: { cards: StudyCard[] }) {
               {direction==="arToEn" ? opt.english : (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
                   <SpeakButton text={opt.arabic} size="sm" />
-                  <span className="arabic" style={{ fontSize: 22 }}>{opt.arabic}</span>
+                  <span className="arabic" style={{ fontSize: 36 }}>{opt.arabic}</span>
                 </div>
               )}
             </button>
@@ -218,7 +218,7 @@ function MatchMode({ cards }: { cards: StudyCard[] }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {leftItems.map(c => (
                 <button key={c.id} onClick={() => pickLeft(c.id)} style={btnStyle(c.id, "left")}>
-                  <div className="arabic" style={{ fontSize: 20, direction: "rtl" }}>{c.arabic}</div>
+                  <div className="arabic" style={{ fontSize: 36, direction: "rtl" }}>{c.arabic}</div>
                 </button>
               ))}
             </div>

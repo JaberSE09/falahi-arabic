@@ -75,8 +75,8 @@ export default function Lessons() {
                 <p className="text-sm mb-4" style={{ color: "#666" }}>{lesson.desc}</p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {lesson.topics.map(t => (
-                    <span key={t} className="text-xs px-3 py-1 rounded-full" style={{ background: "var(--cream)", color: "var(--navy)", border: "1px solid #e8e0d0" }}>
-                      <span className="arabic">{t.split(" — ")[0]}</span> — {t.split(" — ")[1]}
+                    <span key={t} className="px-3 py-2 rounded-full" style={{ background: "var(--cream)", color: "var(--navy)", border: "1px solid #e8e0d0", fontSize: 18 }}>
+                      <span className="arabic" style={{ fontSize: 32 }}>{t.split(" — ")[0]}</span> — {t.split(" — ")[1]}
                     </span>
                   ))}
                 </div>

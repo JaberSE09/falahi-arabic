@@ -63,7 +63,7 @@ export default function HadithPage() {
                 </div>
                 <SpeakButton text={h.arabic} size="md" />
               </div>
-              <div className="arabic" style={{ fontSize: 32, lineHeight: 2.2, color: "var(--navy)", textAlign: "right", direction: "rtl", marginBottom: 12 }}>
+              <div className="arabic" style={{ fontSize: 48, lineHeight: 2.2, color: "var(--navy)", textAlign: "right", direction: "rtl", marginBottom: 12 }}>
                 {h.arabic}
               </div>
               <div style={{ fontSize: 16, fontStyle: "italic", color: "var(--gold)", marginBottom: 6 }}>{h.transliteration}</div>

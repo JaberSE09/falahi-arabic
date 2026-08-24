@@ -10,6 +10,7 @@ const sections = [
       { href: "/flashcards", label: "Flashcards", icon: "🃏" },
       { href: "/phrases",    label: "Phrases",    icon: "💬" },
       { href: "/quiz",       label: "Quiz",       icon: "🎯" },
+      { href: "/games",      label: "Games",      icon: "🎮" },
       { href: "/lessons",    label: "Lessons",    icon: "📖" },
     ],
   },
@@ -34,7 +35,7 @@ export default function Navbar() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 56 }}>
           {/* Logo */}
           <Link href="/" onClick={() => setOpen(false)} style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <span className="arabic" style={{ fontSize: 22, color: "var(--gold-light)" }}>فلاحي</span>
+            <span className="arabic" style={{ fontSize: 28, color: "var(--gold-light)" }}>فلاحي</span>
             <span style={{ color: "white", fontWeight: 700, fontSize: 16 }}>Falahi Arabic</span>
           </Link>
 

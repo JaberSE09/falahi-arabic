@@ -31,6 +31,7 @@ button { font-size: 1rem; }
   font-family: var(--font-amiri), serif;
   direction: rtl;
   line-height: 2;
+  font-size: 2rem;
 }
 
 @keyframes fadeIn {

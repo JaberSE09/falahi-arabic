@@ -21,7 +21,7 @@ export default function Phrases() {
             {words.map((w, i) => (
               <div key={w.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "18px 20px", borderTop: i>0 ? "1px solid #eee" : "none" }}>
                 <SpeakButton text={w.arabic} size="lg" />
-                <div className="arabic" style={{ fontSize: 30, color: "var(--navy)", minWidth: 80, textAlign: "right", flexShrink: 0, lineHeight: 1.5 }}>{w.arabic}</div>
+                <div className="arabic" style={{ fontSize: 42, color: "var(--navy)", minWidth: 120, textAlign: "right", flexShrink: 0, lineHeight: 1.5 }}>{w.arabic}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 18, color: "var(--navy)", lineHeight: 1.3 }}>{w.english}</div>
                   <div style={{ fontSize: 16, fontStyle: "italic", color: "var(--gold)", marginTop: 2 }}>{w.transliteration}</div>
@@ -29,7 +29,7 @@ export default function Phrases() {
                     <div style={{ marginTop: 8, display: "flex", alignItems: "flex-start", gap: 8 }}>
                       <SpeakButton text={w.example} size="sm" />
                       <div>
-                        <div className="arabic" style={{ fontSize: 16, color: "#444" }}>{w.example}</div>
+                        <div className="arabic" style={{ fontSize: 28, color: "#444" }}>{w.example}</div>
                         <div style={{ fontSize: 14, color: "#777", fontStyle: "italic" }}>{w.exampleTranslation}</div>
                       </div>
                     </div>
