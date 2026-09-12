@@ -66,7 +66,7 @@ function StudyList({ lesson, mastered, onMaster }: {
             {mastered.has(i) && <svg width={14} height={14} viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>}
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="arabic" style={{ fontSize: 22, color: "var(--navy)", fontWeight: 700, marginBottom: 2 }}>
+            <div className="arabic" style={{ fontSize: 30, color: "var(--navy)", fontWeight: 700, marginBottom: 2 }}>
               {item.arabic}
             </div>
             <div style={{ fontSize: 13, color: "#888", fontStyle: "italic", marginBottom: 2 }}>
@@ -128,7 +128,7 @@ function FlipCards({ lesson, mastered, onMaster }: {
         {!flipped ? (
           <>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 12, letterSpacing: 1 }}>TAP CARD TO REVEAL</div>
-            <div className="arabic" style={{ fontSize: 38, color: "white", fontWeight: 700, marginBottom: 10 }}>{item.arabic}</div>
+            <div className="arabic" style={{ fontSize: 48, color: "white", fontWeight: 700, marginBottom: 10 }}>{item.arabic}</div>
             <div style={{ fontSize: 16, color: "rgba(255,255,255,0.6)", fontStyle: "italic", marginBottom: 14 }}>{item.transliteration}</div>
             <div onClick={e => e.stopPropagation()}>
               <SpeakButton text={item.arabic} size="lg" />
@@ -138,7 +138,7 @@ function FlipCards({ lesson, mastered, onMaster }: {
           <>
             <div style={{ fontSize: 12, color: lesson.color, marginBottom: 12, letterSpacing: 1, fontWeight: 700 }}>ENGLISH</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: "var(--navy)", marginBottom: 8 }}>{item.english}</div>
-            <div className="arabic" style={{ fontSize: 22, color: "#555", fontWeight: 700, marginBottom: 4 }}>{item.arabic}</div>
+            <div className="arabic" style={{ fontSize: 30, color: "#555", fontWeight: 700, marginBottom: 4 }}>{item.arabic}</div>
             <div style={{ fontSize: 14, color: "#888", fontStyle: "italic", marginBottom: item.note ? 10 : 14 }}>{item.transliteration}</div>
             {item.note && <div style={{ fontSize: 13, color: "#666", background: "#f5f5f5", padding: "6px 12px", borderRadius: 8, marginBottom: 14 }}>💡 {item.note}</div>}
             <div onClick={e => e.stopPropagation()}>
@@ -229,7 +229,7 @@ function QuizMode({ lesson, onFinish }: { lesson: typeof tutoringLessons[0]; onF
       {/* Question */}
       <div style={{ textAlign: "center", marginBottom: 28 }}>
         <div style={{ fontSize: 13, color: "#888", marginBottom: 10, letterSpacing: 1 }}>WHAT DOES THIS MEAN?</div>
-        <div className="arabic" style={{ fontSize: 42, color: "var(--navy)", fontWeight: 700, marginBottom: 6 }}>{q.item.arabic}</div>
+        <div className="arabic" style={{ fontSize: 52, color: "var(--navy)", fontWeight: 700, marginBottom: 6 }}>{q.item.arabic}</div>
         <div style={{ fontSize: 16, color: "#888", fontStyle: "italic" }}>{q.item.transliteration}</div>
         <div style={{ marginTop: 10 }}><SpeakButton text={q.item.arabic} size="md" /></div>
       </div>
@@ -303,7 +303,7 @@ function MatchMode({ lesson, onFinish }: { lesson: typeof tutoringLessons[0]; on
                 background: isDone ? "#D1FAE5" : isWrong ? "#FEE2E2" : isSel ? `${lesson.color}15` : "white",
                 cursor: isDone ? "default" : "pointer", transition: "all 0.15s", opacity: isDone ? 0.6 : 1,
               }}>
-                <div className="arabic" style={{ fontSize: 20, fontWeight: 700, color: isDone ? "#065F46" : "var(--navy)" }}>{item.arabic}</div>
+                <div className="arabic" style={{ fontSize: 28, fontWeight: 700, color: isDone ? "#065F46" : "var(--navy)" }}>{item.arabic}</div>
                 <div style={{ fontSize: 12, color: "#888", fontStyle: "italic", marginTop: 2 }}>{item.transliteration}</div>
               </button>
             );
