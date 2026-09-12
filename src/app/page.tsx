@@ -9,6 +9,16 @@ const palestinianFeatures = [
   { href: "/lessons",    icon: "📖", title: "Lessons",    desc: "7 structured beginner lessons" },
 ];
 
+const tutoringFeatures = [
+  { href: "/tutoring", icon: "🎓", title: "Tutoring Hub",    desc: "All 6 lesson topics in one place" },
+  { href: "/tutoring/lesson?id=days",         icon: "📅", title: "Days & Time Nouns", desc: "Days of week, today, tomorrow, seasons" },
+  { href: "/tutoring/lesson?id=wh-questions", icon: "❓", title: "WH-Questions",      desc: "Shū, Wēn, Lēsh, Kīf, Addēsh..." },
+  { href: "/tutoring/lesson?id=connectors",   icon: "🔗", title: "Connectors",        desc: "In, on, from, because, then, first..." },
+  { href: "/tutoring/lesson?id=time-range-1", icon: "⏰", title: "Telling Time (:00–:30)", desc: "Past the hour — wa + minutes" },
+  { href: "/tutoring/lesson?id=time-range-2", icon: "⏱️", title: "Telling Time (:30–:59)", desc: "Before the hour — illa system" },
+  { href: "/tutoring/lesson?id=plurals",      icon: "🔢", title: "Plural Forms",      desc: "Days, weeks, months, years, seasons" },
+];
+
 const islamicFeatures = [
   { href: "/quran",  icon: "📖", title: "Quran Verses", desc: "Key ayahs with translation and audio" },
   { href: "/dua",    icon: "🤲", title: "Daily Duas",   desc: "Duas with when and how to say them" },
@@ -81,6 +91,33 @@ export default function Home() {
               </div>
             </Link>
           ))}
+        </div>
+      </div>
+
+      {/* Tutoring section */}
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+          <div style={{ width: 6, height: 30, borderRadius: 4, background: "#2563EB", flexShrink: 0 }} />
+          <h2 style={{ fontSize: "clamp(20px,4vw,26px)", fontWeight: 800, color: "var(--navy)", margin: 0 }}>🎓 Arabic Tutoring</h2>
+        </div>
+        <div style={{ padding: "12px 16px", borderRadius: 12, background: "#EFF6FF", border: "2px solid #BFDBFE", marginBottom: 14, fontSize: 14, color: "#1E40AF" }}>
+          📋 Structured lessons from your study sheets — separate from flashcards
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 12 }}>
+          {tutoringFeatures.slice(0, 4).map(f => (
+            <Link key={f.href} href={f.href} style={{ textDecoration: "none" }}>
+              <div style={{ padding: "20px 16px", borderRadius: 16, background: "white", border: "2px solid #ddd", borderLeft: "4px solid #2563EB", height: "100%" }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>{f.icon}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: "var(--navy)", marginBottom: 4 }}>{f.title}</div>
+                <div style={{ fontSize: 14, color: "#555", lineHeight: 1.5 }}>{f.desc}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <div style={{ marginTop: 10 }}>
+          <Link href="/tutoring" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 18px", borderRadius: 10, background: "#2563EB", color: "white", fontWeight: 700, fontSize: 15, textDecoration: "none" }}>
+            View All 6 Lessons →
+          </Link>
         </div>
       </div>
 

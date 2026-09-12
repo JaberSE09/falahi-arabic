@@ -14,6 +14,18 @@ const sections = [
     ],
   },
   {
+    label: "🎓 Tutoring",
+    links: [
+      { href: "/tutoring",                        label: "All Lessons", icon: "🎓" },
+      { href: "/tutoring/lesson?id=days",         label: "Days",        icon: "📅" },
+      { href: "/tutoring/lesson?id=wh-questions", label: "Questions",   icon: "❓" },
+      { href: "/tutoring/lesson?id=connectors",   label: "Connectors",  icon: "🔗" },
+      { href: "/tutoring/lesson?id=time-range-1", label: "Time (Past)", icon: "⏰" },
+      { href: "/tutoring/lesson?id=time-range-2", label: "Time (To)",   icon: "⏱️" },
+      { href: "/tutoring/lesson?id=plurals",      label: "Plurals",     icon: "🔢" },
+    ],
+  },
+  {
     label: "☪️ Islamic",
     links: [
       { href: "/quran",  label: "Quran",  icon: "📖" },
