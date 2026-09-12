@@ -127,18 +127,21 @@ function FlipCards({ lesson, mastered, onMaster }: {
       }}>
         {!flipped ? (
           <>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 16, letterSpacing: 1 }}>TAP TO REVEAL</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 12, letterSpacing: 1 }}>TAP CARD TO REVEAL</div>
             <div className="arabic" style={{ fontSize: 38, color: "white", fontWeight: 700, marginBottom: 10 }}>{item.arabic}</div>
-            <div style={{ fontSize: 16, color: "rgba(255,255,255,0.6)", fontStyle: "italic" }}>{item.transliteration}</div>
+            <div style={{ fontSize: 16, color: "rgba(255,255,255,0.6)", fontStyle: "italic", marginBottom: 14 }}>{item.transliteration}</div>
+            <div onClick={e => e.stopPropagation()}>
+              <SpeakButton text={item.arabic} size="lg" />
+            </div>
           </>
         ) : (
           <>
             <div style={{ fontSize: 12, color: lesson.color, marginBottom: 12, letterSpacing: 1, fontWeight: 700 }}>ENGLISH</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: "var(--navy)", marginBottom: 8 }}>{item.english}</div>
             <div className="arabic" style={{ fontSize: 22, color: "#555", fontWeight: 700, marginBottom: 4 }}>{item.arabic}</div>
-            <div style={{ fontSize: 14, color: "#888", fontStyle: "italic", marginBottom: item.note ? 10 : 0 }}>{item.transliteration}</div>
-            {item.note && <div style={{ fontSize: 13, color: "#666", background: "#f5f5f5", padding: "6px 12px", borderRadius: 8 }}>💡 {item.note}</div>}
-            <div style={{ marginTop: 14 }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 14, color: "#888", fontStyle: "italic", marginBottom: item.note ? 10 : 14 }}>{item.transliteration}</div>
+            {item.note && <div style={{ fontSize: 13, color: "#666", background: "#f5f5f5", padding: "6px 12px", borderRadius: 8, marginBottom: 14 }}>💡 {item.note}</div>}
+            <div onClick={e => e.stopPropagation()}>
               <SpeakButton text={item.arabic} size="lg" />
             </div>
           </>
