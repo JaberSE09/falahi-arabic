@@ -115,7 +115,7 @@ function LessonContent() {
                   </div>
                 )}
               </div>
-              <SpeakButton text={item.arabic} size={36} />
+              <SpeakButton text={item.arabic} size="md" />
             </div>
           ))}
         </div>
@@ -164,7 +164,7 @@ function LessonContent() {
                         {item.note}
                       </div>
                     )}
-                    <SpeakButton text={item.arabic} size={30} />
+                    <SpeakButton text={item.arabic} size="sm" />
                   </>
                 )}
               </div>
