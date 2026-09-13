@@ -56,7 +56,7 @@ const sections: NavSection[] = [
   },
   {
     id: "tutoring",
-    label: "Study Sheets",
+    label: "Tutoring Materials",
     accent: "#2563EB",
     links: [
       { href: "/tutoring", label: "All Lessons", icon: "🎓" },

@@ -107,7 +107,7 @@ export default function Home() {
           <h2 style={{ fontSize: "clamp(20px,4vw,26px)", fontWeight: 800, color: "var(--navy)", margin: 0 }}>🎓 Arabic Tutoring</h2>
         </div>
         <div style={{ padding: "12px 16px", borderRadius: 12, background: "#EFF6FF", border: "2px solid #BFDBFE", marginBottom: 14, fontSize: 14, color: "#1E40AF" }}>
-          📋 Structured lessons from your study sheets — separate from flashcards
+          📋 Tutoring materials from your tutor — separate from flashcards
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 12 }}>
           {tutoringFeatures.slice(0, 4).map(f => (
