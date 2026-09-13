@@ -217,9 +217,27 @@ function MatchMode({ cards }: { cards: StudyCard[] }) {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {leftItems.map(c => (
-                <button key={c.id} onClick={() => pickLeft(c.id)} style={btnStyle(c.id, "left")}>
-                  <div className="arabic" style={{ fontSize: 20, direction: "rtl" }}>{c.arabic}</div>
-                </button>
+                <div
+                  key={c.id}
+                  role="button"
+                  tabIndex={matched.has(c.id) ? -1 : 0}
+                  onClick={(e) => {
+                    if ((e.target as HTMLElement).closest("button")) return;
+                    pickLeft(c.id);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      pickLeft(c.id);
+                    }
+                  }}
+                  style={btnStyle(c.id, "left")}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                    <div className="arabic" style={{ fontSize: 20, direction: "rtl" }}>{c.arabic}</div>
+                    <SpeakButton text={c.arabic} size="sm" />
+                  </div>
+                </div>
               ))}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

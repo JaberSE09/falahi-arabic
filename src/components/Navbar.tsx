@@ -5,6 +5,14 @@ import { useState } from "react";
 
 const sections = [
   {
+    label: "Practice",
+    color: "#C9963A",
+    links: [
+      { href: "/review", label: "Review", icon: "🔁" },
+      { href: "/pronounce", label: "Pronounce", icon: "🎙️" },
+    ],
+  },
+  {
     label: "🇵🇸 Palestinian",
     color: "#B8860B",
     links: [

@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { vocabulary } from "@/lib/vocabulary";
 import { quranVerses, duas, hadiths } from "@/lib/islamic";
+import ProgressHint from "@/components/ProgressHint";
 
 const palestinianFeatures = [
+  { href: "/review",     icon: "🔁", title: "Review",     desc: "Due today and words you missed" },
+  { href: "/pronounce",  icon: "🎙️", title: "Pronounce",  desc: "Say words aloud — Right or Wrong" },
   { href: "/flashcards", icon: "🃏", title: "Flashcards", desc: "Flip cards — Arabic to English, study by category" },
   { href: "/phrases",    icon: "💬", title: "Phrases",    desc: "All words with pronunciation guide" },
-  { href: "/quiz",       icon: "🎯", title: "Quiz",       desc: "Multiple choice, Arabic ↔ English" },
+  { href: "/quiz",       icon: "🎯", title: "Quiz",       desc: "Multiple choice, including My gaps" },
   { href: "/lessons",    icon: "📖", title: "Lessons",    desc: "7 structured beginner lessons" },
 ];
 
@@ -36,13 +39,14 @@ export default function Home() {
           Palestinian dialect for daily life · Quranic Arabic for Islamic learning
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 12 }}>
-          <Link href="/flashcards" style={{ padding: "14px 28px", borderRadius: 12, background: "var(--gold)", color: "white", fontWeight: 800, fontSize: 17, textDecoration: "none" }}>🇵🇸 Palestinian Arabic</Link>
-          <Link href="/quran" style={{ padding: "14px 28px", borderRadius: 12, background: "rgba(255,255,255,0.15)", color: "white", fontWeight: 800, fontSize: 17, textDecoration: "none", border: "2px solid rgba(255,255,255,0.3)" }}>☪️ Islamic Arabic</Link>
+          <Link href="/review" style={{ padding: "14px 28px", borderRadius: 12, background: "var(--gold)", color: "white", fontWeight: 800, fontSize: 17, textDecoration: "none" }}>Review</Link>
+          <Link href="/pronounce" style={{ padding: "14px 28px", borderRadius: 12, background: "rgba(255,255,255,0.15)", color: "white", fontWeight: 800, fontSize: 17, textDecoration: "none", border: "2px solid rgba(255,255,255,0.3)" }}>Pronounce</Link>
+          <Link href="/flashcards" style={{ padding: "14px 28px", borderRadius: 12, background: "rgba(255,255,255,0.15)", color: "white", fontWeight: 800, fontSize: 17, textDecoration: "none", border: "2px solid rgba(255,255,255,0.3)" }}>Flashcards</Link>
         </div>
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 20 }}>
         {[
           { label: "Words",    value: vocabulary.length,  color: "var(--gold)" },
           { label: "Verses",   value: quranVerses.length, color: "#2563EB" },
@@ -55,6 +59,8 @@ export default function Home() {
           </div>
         ))}
       </div>
+
+      <ProgressHint />
 
       {/* Palestinian section */}
       <div style={{ marginBottom: 32 }}>
