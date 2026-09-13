@@ -15,7 +15,7 @@ export default function TutoringPage() {
           Arabic Tutoring
         </h1>
         <p style={{ fontSize: "clamp(15px,3vw,18px)", color: "rgba(255,255,255,0.8)", margin: 0, maxWidth: 420, marginLeft: "auto", marginRight: "auto" }}>
-          Structured lessons from your study sheets — days, time, questions, connectors
+          Structured lessons from your tutor — days, time, questions, connectors
         </p>
       </div>
 
@@ -26,7 +26,7 @@ export default function TutoringPage() {
       }}>
         <div style={{ fontSize: 22, flexShrink: 0 }}>💡</div>
         <div style={{ fontSize: 15, color: "#92400E", lineHeight: 1.6 }}>
-          <strong>This section is separate from flashcards.</strong> These are structured lessons based on your handwritten study sheets — Palestinian dialect grammar and vocabulary in context.
+          <strong>This section is separate from flashcards.</strong> These are tutoring materials from your tutor — Palestinian dialect grammar and vocabulary in context.
         </div>
       </div>
 
