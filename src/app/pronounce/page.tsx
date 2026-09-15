@@ -45,8 +45,8 @@ export default function PronouncePage() {
     <div className="fade-in">
       <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--navy)", marginBottom: 8 }}>Pronounce</h1>
       <p style={{ color: "#555", marginBottom: 20, fontSize: 16, lineHeight: 1.5 }}>
-        Listen, then say the Arabic word. You&apos;ll get <strong>Right</strong> or <strong>Wrong</strong> feedback.
-        Works best in Chrome or Edge.
+        Listen to the word, tap <strong>Say it</strong>, then speak. You&apos;ll see{" "}
+        <strong>Correct</strong> or <strong>Incorrect</strong> right away. Works best in Chrome or Edge.
       </p>
       <p style={{ color: "#666", marginBottom: 24, fontSize: 15, fontWeight: 600 }}>
         Due {counts.due} · Missed {counts.missed} · Known {counts.known}
@@ -103,7 +103,7 @@ export default function PronouncePage() {
                 color: lastOk ? "#2D7A4F" : "#e85d75",
               }}
             >
-              {lastOk ? "Right — nice!" : "Wrong — listen again and retry"}
+              {lastOk ? "Correct — nice!" : "Incorrect — listen again and retry"}
             </div>
           )}
 

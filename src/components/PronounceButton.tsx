@@ -2,18 +2,27 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  bestPronunciationMatch,
   getSpeechRecognitionCtor,
-  pronunciationMatches,
   type SpeechRecognitionLike,
 } from "@/lib/pronounce";
 
-type Feedback = "idle" | "listening" | "right" | "wrong" | "unsupported" | "error";
+type Feedback =
+  | "idle"
+  | "listening"
+  | "right"
+  | "wrong"
+  | "nohear"
+  | "unsupported"
+  | "error";
 
 interface PronounceButtonProps {
   targetArabic: string;
   onResult?: (ok: boolean, heard: string) => void;
   size?: "md" | "lg";
 }
+
+const LISTEN_MS = 5000;
 
 export default function PronounceButton({
   targetArabic,
@@ -22,26 +31,38 @@ export default function PronounceButton({
 }: PronounceButtonProps) {
   const [feedback, setFeedback] = useState<Feedback>("idle");
   const [heard, setHeard] = useState("");
+  const [interim, setInterim] = useState("");
   const recogRef = useRef<SpeechRecognitionLike | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const gotFinalRef = useRef(false);
   const supported = typeof window !== "undefined" && !!getSpeechRecognitionCtor();
+
+  const clearTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     return () => {
+      clearTimer();
       try {
         recogRef.current?.abort();
       } catch {
         /* ignore */
       }
     };
-  }, []);
+  }, [clearTimer]);
 
   const stop = useCallback(() => {
+    clearTimer();
     try {
       recogRef.current?.stop();
     } catch {
       /* ignore */
     }
-  }, []);
+  }, [clearTimer]);
 
   const start = useCallback(() => {
     const Ctor = getSpeechRecognitionCtor();
@@ -50,7 +71,10 @@ export default function PronounceButton({
       return;
     }
     setHeard("");
+    setInterim("");
     setFeedback("listening");
+    gotFinalRef.current = false;
+    clearTimer();
     try {
       recogRef.current?.abort();
     } catch {
@@ -59,52 +83,99 @@ export default function PronounceButton({
     const recog = new Ctor();
     recogRef.current = recog;
     recog.lang = "ar-SA";
-    recog.interimResults = false;
-    recog.maxAlternatives = 3;
+    recog.interimResults = true;
+    recog.maxAlternatives = 5;
     recog.continuous = false;
+
     recog.onresult = (event) => {
-      const transcript = event.results[0]?.[0]?.transcript?.trim() ?? "";
-      setHeard(transcript);
-      const ok = pronunciationMatches(transcript, targetArabic);
+      const lastIdx = event.results.length - 1;
+      const last = event.results[lastIdx];
+      if (!last) return;
+
+      const alts: string[] = [];
+      for (let i = 0; i < last.length; i++) {
+        const t = last[i]?.transcript?.trim();
+        if (t) alts.push(t);
+      }
+      const primary = alts[0] ?? "";
+
+      if (!last.isFinal) {
+        setInterim(primary);
+        return;
+      }
+
+      gotFinalRef.current = true;
+      clearTimer();
+      const { ok, heard: bestHeard } = bestPronunciationMatch(alts, targetArabic);
+      setInterim("");
+      setHeard(bestHeard);
       setFeedback(ok ? "right" : "wrong");
-      onResult?.(ok, transcript);
+      onResult?.(ok, bestHeard);
     };
+
     recog.onerror = (event) => {
-      if (event.error === "aborted" || event.error === "no-speech") {
-        setFeedback("idle");
+      clearTimer();
+      if (event.error === "aborted") {
+        setFeedback((f) => (f === "listening" ? "idle" : f));
+        return;
+      }
+      if (event.error === "no-speech") {
+        setFeedback("nohear");
+        setInterim("");
         return;
       }
       setFeedback("error");
+      setInterim("");
     };
+
     recog.onend = () => {
-      setFeedback((f) => (f === "listening" ? "idle" : f));
+      clearTimer();
+      setFeedback((f) => {
+        if (f !== "listening") return f;
+        if (!gotFinalRef.current) return "nohear";
+        return "idle";
+      });
+      setInterim("");
     };
+
     try {
       recog.start();
+      timerRef.current = setTimeout(() => {
+        try {
+          recog.stop();
+        } catch {
+          /* ignore */
+        }
+      }, LISTEN_MS);
     } catch {
+      clearTimer();
       setFeedback("error");
     }
-  }, [onResult, targetArabic]);
+  }, [clearTimer, onResult, targetArabic]);
 
   const btnSize = size === "lg" ? 72 : 52;
   const label =
     feedback === "listening"
-      ? "Listening…"
+      ? interim
+        ? `Hearing… ${interim}`
+        : "Listening…"
       : feedback === "right"
-        ? "Right"
+        ? "Correct!"
         : feedback === "wrong"
-          ? "Wrong"
-          : feedback === "unsupported"
-            ? "Mic not supported — use Chrome"
-            : feedback === "error"
-              ? "Mic error — try again"
-              : "Tap mic and say the word";
+          ? "Incorrect"
+          : feedback === "nohear"
+            ? "Didn’t hear you — try again"
+            : feedback === "unsupported"
+              ? "Mic not supported — use Chrome"
+              : feedback === "error"
+                ? "Mic error — try again"
+                : "Say it";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
       <button
         type="button"
-        aria-label="Speak the Arabic word"
+        aria-label="Say the Arabic word"
         disabled={!supported && feedback === "unsupported"}
         onClick={() => {
           if (feedback === "listening") stop();
@@ -122,15 +193,24 @@ export default function PronounceButton({
               ? "var(--gold)"
               : feedback === "right"
                 ? "#2D7A4F"
-                : feedback === "wrong" || feedback === "error"
+                : feedback === "wrong" || feedback === "error" || feedback === "nohear"
                   ? "#e85d75"
                   : "var(--navy)",
           color: "white",
           boxShadow: feedback === "listening" ? "0 0 0 8px rgba(201,150,58,0.25)" : "none",
         }}
       >
-        {feedback === "listening" ? "…" : feedback === "right" ? "✓" : feedback === "wrong" ? "✕" : "🎙️"}
+        {feedback === "listening"
+          ? "…"
+          : feedback === "right"
+            ? "✓"
+            : feedback === "wrong"
+              ? "✕"
+              : feedback === "nohear"
+                ? "?"
+                : "🎙️"}
       </button>
+
       <div
         style={{
           fontWeight: 800,
@@ -138,7 +218,7 @@ export default function PronounceButton({
           color:
             feedback === "right"
               ? "#2D7A4F"
-              : feedback === "wrong"
+              : feedback === "wrong" || feedback === "nohear"
                 ? "#e85d75"
                 : "var(--navy)",
           textAlign: "center",
@@ -146,17 +226,74 @@ export default function PronounceButton({
       >
         {label}
       </div>
-      {heard && (
-        <div style={{ fontSize: 15, color: "#555", textAlign: "center" }}>
-          Heard: <span className="arabic" style={{ fontSize: 22 }}>{heard}</span>
+
+      {(feedback === "right" || feedback === "wrong") && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            width: "100%",
+            maxWidth: 420,
+            borderRadius: 14,
+            padding: "16px 18px",
+            textAlign: "center",
+            background: feedback === "right" ? "rgba(45,122,79,0.12)" : "rgba(232,93,117,0.12)",
+            border: `2px solid ${feedback === "right" ? "#2D7A4F" : "#e85d75"}`,
+          }}
+        >
+          <div
+            style={{
+              fontWeight: 900,
+              fontSize: 22,
+              color: feedback === "right" ? "#2D7A4F" : "#e85d75",
+              marginBottom: feedback === "wrong" ? 12 : 0,
+            }}
+          >
+            {feedback === "right" ? "Correct!" : "Incorrect"}
+          </div>
+          {feedback === "wrong" && (
+            <div
+              style={{
+                display: "flex",
+                gap: 16,
+                justifyContent: "center",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#666", marginBottom: 4 }}>
+                  Heard
+                </div>
+                <div className="arabic" style={{ fontSize: 28, color: "var(--navy)" }}>
+                  {heard || "—"}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#666", marginBottom: 4 }}>
+                  Expected
+                </div>
+                <div className="arabic" style={{ fontSize: 28, color: "var(--navy)" }}>
+                  {targetArabic}
+                </div>
+              </div>
+            </div>
+          )}
+          {feedback === "right" && heard && (
+            <div style={{ marginTop: 8, fontSize: 15, color: "#555" }}>
+              Heard: <span className="arabic" style={{ fontSize: 22 }}>{heard}</span>
+            </div>
+          )}
         </div>
       )}
-      {(feedback === "right" || feedback === "wrong") && (
+
+      {(feedback === "right" || feedback === "wrong" || feedback === "nohear") && (
         <button
           type="button"
           onClick={() => {
             setFeedback("idle");
             setHeard("");
+            setInterim("");
             start();
           }}
           style={{

@@ -12,15 +12,59 @@ export function normalizeArabic(text: string): string {
     .trim();
 }
 
+function maxAllowedDistance(len: number): number {
+  if (len <= 4) return 1;
+  return 2;
+}
+
 export function pronunciationMatches(heard: string, target: string): boolean {
   const a = normalizeArabic(heard);
   const b = normalizeArabic(target);
   if (!a || !b) return false;
   if (a === b) return true;
   if (a.includes(b) || b.includes(a)) return true;
-  // Allow one-character edit distance for short words
-  if (Math.abs(a.length - b.length) <= 1 && editDistance(a, b) <= 1) return true;
+
+  const targetTokens = b.split(" ").filter(Boolean);
+  if (targetTokens.some((tok) => tok === a || a.includes(tok) || tok.includes(a))) {
+    return true;
+  }
+
+  const heardTokens = a.split(" ").filter(Boolean);
+  if (heardTokens.some((tok) => tok === b || pronunciationTokenClose(tok, b))) {
+    return true;
+  }
+
+  const limit = maxAllowedDistance(Math.min(a.length, b.length));
+  if (Math.abs(a.length - b.length) <= limit && editDistance(a, b) <= limit) {
+    return true;
+  }
   return false;
+}
+
+function pronunciationTokenClose(heardTok: string, target: string): boolean {
+  if (!heardTok || !target) return false;
+  if (heardTok === target) return true;
+  const limit = maxAllowedDistance(Math.min(heardTok.length, target.length));
+  return (
+    Math.abs(heardTok.length - target.length) <= limit &&
+    editDistance(heardTok, target) <= limit
+  );
+}
+
+/** Pick the best transcript alternative against the target Arabic. */
+export function bestPronunciationMatch(
+  heardAlternatives: string[],
+  target: string,
+): { ok: boolean; heard: string } {
+  const alts = heardAlternatives.map((s) => s.trim()).filter(Boolean);
+  if (alts.length === 0) return { ok: false, heard: "" };
+
+  for (const alt of alts) {
+    if (pronunciationMatches(alt, target)) {
+      return { ok: true, heard: alt };
+    }
+  }
+  return { ok: false, heard: alts[0] ?? "" };
 }
 
 function editDistance(a: string, b: string): number {
@@ -56,7 +100,12 @@ export type SpeechRecognitionLike = {
 };
 
 export type SpeechRecognitionEventLike = {
-  results: ArrayLike<{ 0: { transcript: string }; isFinal: boolean; length: number }>;
+  results: ArrayLike<{
+    0: { transcript: string };
+    isFinal: boolean;
+    length: number;
+    [index: number]: { transcript: string };
+  }>;
 };
 
 export function getSpeechRecognitionCtor():
