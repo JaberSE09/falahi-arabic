@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, Suspense } from "react";
 import Link from "next/link";
-import { vocabulary, type Word } from "@/lib/vocabulary";
+import { useSearchParams } from "next/navigation";
+import { vocabulary, categories, type Word } from "@/lib/vocabulary";
 import SpeakButton from "@/components/SpeakButton";
 import PronounceButton from "@/components/PronounceButton";
 import { useProgress } from "@/hooks/useProgress";
@@ -10,29 +11,60 @@ import { getDueWords, getMissedWords, shuffle } from "@/lib/progress";
 
 type Tab = "due" | "missed";
 
-export default function ReviewPage() {
+function ReviewInner() {
+  const searchParams = useSearchParams();
+  const initial = searchParams.get("section");
+  const validInitial = initial && categories.includes(initial) ? initial : "All";
+
   const { progress, correct, wrong, reset, counts, refresh } = useProgress();
-  const [tab, setTab] = useState<Tab>("due");
+  const [tab, setTab] = useState<Tab>("missed");
+  const [section, setSection] = useState<string>(validInitial);
   const [idx, setIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
-  const due = useMemo(() => shuffle(getDueWords(vocabulary, progress)), [progress]);
-  const missed = useMemo(() => shuffle(getMissedWords(vocabulary, progress)), [progress]);
+  useEffect(() => {
+    if (validInitial !== section && searchParams.get("section")) {
+      setSection(validInitial);
+    }
+  }, [validInitial]); // eslint-disable-line react-hooks/exhaustive-deps -- sync from URL once when param present
+
+  const dueAll = useMemo(() => getDueWords(vocabulary, progress), [progress]);
+  const missedAll = useMemo(() => getMissedWords(vocabulary, progress), [progress]);
+
+  const due = useMemo(() => {
+    const list = section === "All" ? dueAll : dueAll.filter((w) => w.category === section);
+    return shuffle(list);
+  }, [dueAll, section]);
+
+  const missed = useMemo(() => {
+    const list = section === "All" ? missedAll : missedAll.filter((w) => w.category === section);
+    return shuffle(list);
+  }, [missedAll, section]);
+
   const queue: Word[] = tab === "due" ? due : missed;
   const word = queue[idx] ?? null;
+
+  const sectionCounts = useMemo(() => {
+    const source = tab === "due" ? dueAll : missedAll;
+    const map: Record<string, number> = { All: source.length };
+    for (const cat of categories) {
+      map[cat] = source.filter((w) => w.category === cat).length;
+    }
+    return map;
+  }, [tab, dueAll, missedAll]);
 
   useEffect(() => {
     setIdx(0);
     setFlipped(false);
-  }, [tab]);
+  }, [tab, section]);
 
   useEffect(() => {
     if (idx >= queue.length) setIdx(0);
   }, [queue.length, idx]);
 
   useEffect(() => {
-    if (due.length === 0 && missed.length > 0) setTab("missed");
-  }, [due.length, missed.length]);
+    if (tab === "due" && due.length === 0 && missed.length > 0) setTab("missed");
+  }, [tab, due.length, missed.length]);
 
   const advance = (ok: boolean) => {
     if (!word) return;
@@ -47,18 +79,45 @@ export default function ReviewPage() {
     <div className="fade-in">
       <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--navy)", marginBottom: 8 }}>Review</h1>
       <p style={{ color: "#555", marginBottom: 8, fontSize: 16, lineHeight: 1.5 }}>
-        Best order: <strong>Due</strong> → <strong>Missed</strong> →{" "}
-        <Link href="/flashcards" style={{ color: "var(--gold)", fontWeight: 700 }}>New</Link> →{" "}
-        <Link href="/pronounce" style={{ color: "var(--gold)", fontWeight: 700 }}>Pronounce</Link>
+        Study words you got wrong — pick a section, then drill Missed or Due.
       </p>
-      <p style={{ color: "#666", marginBottom: 20, fontSize: 15, fontWeight: 600 }}>
+      <p style={{ color: "#666", marginBottom: 16, fontSize: 15, fontWeight: 600 }}>
         Due {counts.due} · Missed {counts.missed} · Known {counts.known}
       </p>
 
+      <div style={{ fontSize: 13, fontWeight: 800, color: "#888", letterSpacing: 0.6, marginBottom: 8, textTransform: "uppercase" }}>
+        Section
+      </div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
+        {["All", ...categories].map((cat) => {
+          const n = sectionCounts[cat] ?? 0;
+          const active = section === cat;
+          return (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSection(cat)}
+              style={{
+                padding: "9px 14px",
+                borderRadius: 99,
+                fontWeight: 700,
+                fontSize: 14,
+                cursor: "pointer",
+                background: active ? "var(--gold)" : "white",
+                color: "var(--navy)",
+                border: "2px solid " + (active ? "var(--gold)" : "#ddd"),
+              }}
+            >
+              {cat} ({n})
+            </button>
+          );
+        })}
+      </div>
+
       <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
         {([
+          { key: "missed" as const, label: `Wrong / Missed (${missed.length})` },
           { key: "due" as const, label: `Due today (${due.length})` },
-          { key: "missed" as const, label: `Missed (${missed.length})` },
         ]).map((t) => (
           <button
             key={t.key}
@@ -91,21 +150,43 @@ export default function ReviewPage() {
         >
           <div style={{ fontSize: 40, marginBottom: 12 }}>✨</div>
           <div style={{ fontWeight: 800, fontSize: 20, color: "var(--navy)", marginBottom: 10 }}>
-            {tab === "due" ? "Nothing due right now" : "No missed words"}
+            {tab === "due"
+              ? section === "All"
+                ? "Nothing due right now"
+                : `Nothing due in ${section}`
+              : section === "All"
+                ? "No missed words yet"
+                : `No wrong words in ${section}`}
           </div>
           <p style={{ color: "#555", marginBottom: 20 }}>
-            Study new words or practice pronunciation.
+            {tab === "missed"
+              ? "Miss some in Quiz or Flashcards, then come back to drill this section."
+              : "Study new words or switch to Missed."}
           </p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-            <Link href="/flashcards" style={ctaStyle}>Flashcards</Link>
-            <Link href="/pronounce" style={ctaStyle}>Pronounce</Link>
-            <Link href="/arabic-101" style={ctaOutline}>Arabic 101</Link>
+            <Link
+              href={section === "All" ? "/quiz" : `/quiz?section=${encodeURIComponent(section)}`}
+              style={ctaStyle}
+            >
+              Quiz this section
+            </Link>
+            <Link
+              href={section === "All" ? "/flashcards" : `/flashcards?category=${encodeURIComponent(section)}`}
+              style={ctaStyle}
+            >
+              Flashcards
+            </Link>
+            <Link href="/pronounce" style={ctaOutline}>Pronounce</Link>
           </div>
         </div>
       ) : (
         <>
-          <div style={{ marginBottom: 12, fontWeight: 700, color: "var(--navy)" }}>
-            {idx + 1} / {queue.length}
+          <div style={{ marginBottom: 12, fontWeight: 700, color: "var(--navy)", display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+            <span>
+              {Math.min(idx + 1, queue.length)} / {queue.length}
+              {section !== "All" ? ` · ${section}` : ""}
+            </span>
+            <span style={{ fontSize: 14, color: "#888" }}>{word.category}</span>
           </div>
           <div
             onClick={(e) => {
@@ -178,6 +259,14 @@ export default function ReviewPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function ReviewPage() {
+  return (
+    <Suspense fallback={<div className="fade-in" style={{ padding: 24, fontWeight: 700, color: "var(--navy)" }}>Loading review…</div>}>
+      <ReviewInner />
+    </Suspense>
   );
 }
 

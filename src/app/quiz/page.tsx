@@ -1,15 +1,25 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import { vocabulary } from "@/lib/vocabulary";
+import { useState, useEffect, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { vocabulary, categories } from "@/lib/vocabulary";
 import SpeakButton from "@/components/SpeakButton";
 import { useProgress } from "@/hooks/useProgress";
-import { pickGapWords, shuffle, getProgress } from "@/lib/progress";
+import { pickGapWords, shuffle, getProgress, getMissedWords, getDueWords } from "@/lib/progress";
 
 function getOptions(correct: (typeof vocabulary)[0], all: typeof vocabulary) {
-  return shuffle([correct, ...shuffle(all.filter((w) => w.id !== correct.id)).slice(0, 3)]);
+  const pool = all.filter((w) => w.id !== correct.id);
+  const sameCat = pool.filter((w) => w.category === correct.category);
+  const distractors = shuffle(sameCat.length >= 3 ? sameCat : pool).slice(0, 3);
+  return shuffle([correct, ...distractors]);
 }
 
-export default function Quiz() {
+function QuizInner() {
+  const searchParams = useSearchParams();
+  const initialSection = searchParams.get("section");
+  const validInitial =
+    initialSection && categories.includes(initialSection) ? initialSection : "All";
+
   const [questions, setQuestions] = useState<typeof vocabulary>([]);
   const [current, setCurrent] = useState(0);
   const [options, setOptions] = useState<typeof vocabulary>([]);
@@ -18,29 +28,44 @@ export default function Quiz() {
   const [done, setDone] = useState(false);
   const [mode, setMode] = useState<"arToEn" | "enToAr">("arToEn");
   const [pool, setPool] = useState<"gaps" | "all">("gaps");
-  const { correct, wrong, counts } = useProgress();
+  const [section, setSection] = useState<string>(validInitial);
+  const { correct, wrong, counts, progress } = useProgress();
+
+  const scoped = section === "All" ? vocabulary : vocabulary.filter((w) => w.category === section);
 
   const start = useCallback(() => {
     const saved = getProgress();
+    const source = section === "All" ? vocabulary : vocabulary.filter((w) => w.category === section);
+    if (source.length === 0) {
+      setQuestions([]);
+      return;
+    }
     const q =
       pool === "gaps"
-        ? pickGapWords(vocabulary, saved, 10)
-        : shuffle(vocabulary).slice(0, 10);
+        ? pickGapWords(source, saved, Math.min(10, source.length))
+        : shuffle(source).slice(0, Math.min(10, source.length));
     setQuestions(q);
     setCurrent(0);
     setScore(0);
     setDone(false);
     setSelected(null);
-    if (q[0]) setOptions(getOptions(q[0], vocabulary));
-  }, [pool]);
+    if (q[0]) setOptions(getOptions(q[0], source));
+  }, [pool, section]);
 
   useEffect(() => {
     start();
   }, [start, mode]);
 
   useEffect(() => {
-    if (questions[current]) setOptions(getOptions(questions[current], vocabulary));
-  }, [current, questions]);
+    const source = section === "All" ? vocabulary : vocabulary.filter((w) => w.category === section);
+    if (questions[current]) setOptions(getOptions(questions[current], source));
+  }, [current, questions, section]);
+
+  const gapCountInSection = (() => {
+    const missed = getMissedWords(scoped, progress).length;
+    const due = getDueWords(scoped, progress).length;
+    return missed + due;
+  })();
 
   const handleAnswer = (opt: (typeof vocabulary)[0]) => {
     if (selected !== null) return;
@@ -62,7 +87,51 @@ export default function Quiz() {
     }, 1400);
   };
 
-  if (!questions.length) return null;
+  if (!questions.length) {
+    return (
+      <div className="fade-in" style={{ textAlign: "center", padding: "48px 20px" }}>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--navy)", marginBottom: 12 }}>Quiz</h1>
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 20 }}>
+          {["All", ...categories].map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSection(cat)}
+              style={{
+                padding: "9px 14px",
+                borderRadius: 99,
+                fontWeight: 700,
+                fontSize: 14,
+                cursor: "pointer",
+                background: section === cat ? "var(--gold)" : "white",
+                color: "var(--navy)",
+                border: "2px solid " + (section === cat ? "var(--gold)" : "#ddd"),
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+        <p style={{ color: "#555", marginBottom: 16 }}>
+          {pool === "gaps"
+            ? `No gap words${section !== "All" ? ` in ${section}` : ""} yet. Try All words or another section.`
+            : "No words in this section."}
+        </p>
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={() => setPool("all")}
+            style={{ padding: "12px 20px", borderRadius: 12, background: "var(--navy)", color: "white", fontWeight: 800, border: "none", cursor: "pointer" }}
+          >
+            Quiz all words in section
+          </button>
+          <Link href="/review" style={{ padding: "12px 20px", borderRadius: 12, background: "white", color: "var(--navy)", fontWeight: 800, border: "2px solid var(--navy)", textDecoration: "none" }}>
+            Review missed
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (done) {
     return (
@@ -70,6 +139,9 @@ export default function Quiz() {
         <div style={{ fontSize: 72, marginBottom: 16 }}>🎉</div>
         <div style={{ fontSize: 42, fontWeight: 800, color: "var(--navy)", marginBottom: 8 }}>
           {score} / {questions.length}
+        </div>
+        <div style={{ color: "#555", marginBottom: 20, fontSize: 18 }}>
+          {section !== "All" ? section : "All sections"}
         </div>
         <div style={{ color: "#555", marginBottom: 32, fontSize: 20, lineHeight: 1.5 }}>
           {score === questions.length ? "Perfect! ماشاءالله 🌟" : score >= 7 ? "Great job! 💪" : "Keep going! 📖"}
@@ -82,6 +154,12 @@ export default function Quiz() {
           >
             Try Again
           </button>
+          <Link
+            href={section === "All" ? "/review" : `/review?section=${encodeURIComponent(section)}`}
+            style={{ padding: "16px 32px", borderRadius: 14, background: "var(--gold)", color: "white", fontWeight: 800, fontSize: 18, textDecoration: "none" }}
+          >
+            Review wrong words
+          </Link>
           <button
             type="button"
             onClick={() => {
@@ -101,7 +179,7 @@ export default function Quiz() {
 
   return (
     <div className="fade-in">
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--navy)", margin: 0 }}>Quiz</h1>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {(["gaps", "all"] as const).map((p) => (
@@ -120,7 +198,7 @@ export default function Quiz() {
                 border: "2px solid " + (pool === p ? "var(--gold)" : "#ddd"),
               }}
             >
-              {p === "gaps" ? `My gaps (${counts.missed + counts.due})` : "All words"}
+              {p === "gaps" ? `My gaps (${gapCountInSection || counts.missed + counts.due})` : "All words"}
             </button>
           ))}
           {(["arToEn", "enToAr"] as const).map((m) => (
@@ -143,6 +221,31 @@ export default function Quiz() {
             </button>
           ))}
         </div>
+      </div>
+
+      <div style={{ fontSize: 13, fontWeight: 800, color: "#888", letterSpacing: 0.6, marginBottom: 8, textTransform: "uppercase" }}>
+        Section
+      </div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+        {["All", ...categories].map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setSection(cat)}
+            style={{
+              padding: "8px 14px",
+              borderRadius: 99,
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: "pointer",
+              background: section === cat ? "var(--navy)" : "white",
+              color: section === cat ? "white" : "var(--navy)",
+              border: "2px solid var(--navy)",
+            }}
+          >
+            {cat}
+          </button>
+        ))}
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
@@ -232,5 +335,13 @@ export default function Quiz() {
         })}
       </div>
     </div>
+  );
+}
+
+export default function Quiz() {
+  return (
+    <Suspense fallback={<div className="fade-in" style={{ padding: 24, fontWeight: 700, color: "var(--navy)" }}>Loading quiz…</div>}>
+      <QuizInner />
+    </Suspense>
   );
 }
