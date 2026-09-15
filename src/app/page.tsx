@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { vocabulary } from "@/lib/vocabulary";
-import { quranVerses, duas, hadiths } from "@/lib/islamic";
+import { duas, hadiths } from "@/lib/islamic";
+import { quranSurahs } from "@/lib/quranSurahs";
 import ProgressHint from "@/components/ProgressHint";
 
 const palestinianFeatures = [
@@ -23,7 +24,7 @@ const tutoringFeatures = [
 ];
 
 const islamicFeatures = [
-  { href: "/quran",  icon: "📖", title: "Quran Verses", desc: "Key ayahs with translation and audio" },
+  { href: "/quran",  icon: "📖", title: "Quran", desc: "Short surahs, ayah by ayah — listen, recall, chain" },
   { href: "/dua",    icon: "🤲", title: "Daily Duas",   desc: "Duas with when and how to say them" },
   { href: "/hadith", icon: "📿", title: "Hadith",       desc: "Prophetic narrations with translation" },
 ];
@@ -49,7 +50,7 @@ export default function Home() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 20 }}>
         {[
           { label: "Words",    value: vocabulary.length,  color: "var(--gold)" },
-          { label: "Verses",   value: quranVerses.length, color: "#2563EB" },
+          { label: "Surahs",   value: quranSurahs.length, color: "#2563EB" },
           { label: "Duas",     value: duas.length,        color: "var(--green)" },
           { label: "Hadiths",  value: hadiths.length,     color: "#7C3AED" },
         ].map(s => (
