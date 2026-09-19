@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import SpeakButton from "@/components/SpeakButton";
@@ -23,12 +23,23 @@ export default function QuranSurahLearnPage() {
   const [phase, setPhase] = useState<Phase>("study");
   const [reviewMode, setReviewMode] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const chainTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setHydrated(false);
     setPhase("study");
     setReviewMode(false);
+    if (chainTimerRef.current) {
+      clearTimeout(chainTimerRef.current);
+      chainTimerRef.current = null;
+    }
   }, [slug]);
+
+  useEffect(() => {
+    return () => {
+      if (chainTimerRef.current) clearTimeout(chainTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!surah || !summary || hydrated) return;
@@ -267,7 +278,7 @@ export default function QuranSurahLearnPage() {
               borderRadius: 22,
               background: "var(--navy)",
               padding: "28px 22px",
-              marginBottom: 18,
+              marginBottom: 16,
               textAlign: "center",
             }}
           >
@@ -304,7 +315,7 @@ export default function QuranSurahLearnPage() {
             ) : (
               <>
                 <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 16, marginBottom: 16, lineHeight: 1.5 }}>
-                  Recite ayah {ayah.ayah} from memory, then check yourself.
+                  Recite ayah {ayah.ayah} from memory, then tap Say it to check.
                 </div>
                 <button
                   type="button"
@@ -317,27 +328,37 @@ export default function QuranSurahLearnPage() {
                     color: "white",
                     fontWeight: 700,
                     cursor: "pointer",
-                    marginBottom: 18,
                   }}
                 >
                   Peek at the line
                 </button>
-                <div style={{ background: "rgba(255,255,255,0.08)", borderRadius: 16, padding: 16 }}>
-                  <div style={{ color: "rgba(255,255,255,0.7)", fontWeight: 700, marginBottom: 10, fontSize: 14 }}>
-                    Say it (optional)
-                  </div>
-                  <PronounceButton
-                    key={`${surah.number}-${ayah.ayah}-say`}
-                    targetArabic={ayah.arabic}
-                    size="md"
-                    onResult={(ok) => {
-                      if (ok) correct(surah.number, ayah.ayah);
-                      else wrong(surah.number, ayah.ayah);
-                    }}
-                  />
-                </div>
               </>
             )}
+          </div>
+
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontWeight: 800, color: "var(--navy)", marginBottom: 10, fontSize: 16 }}>
+              Say it — tap the mic and recite this line
+            </div>
+            <p style={{ color: "#666", fontSize: 14, margin: "0 0 12px", lineHeight: 1.4 }}>
+              After you speak, you&apos;ll hear and see <strong>Correct</strong> or <strong>Incorrect</strong>.
+            </p>
+            <PronounceButton
+              key={`${surah.number}-${ayah.ayah}-say`}
+              targetArabic={ayah.arabic}
+              targetTransliteration={ayah.transliteration}
+              size="lg"
+              onResult={(ok) => {
+                if (ok) {
+                  correct(surah.number, ayah.ayah);
+                  if (chainTimerRef.current) clearTimeout(chainTimerRef.current);
+                  // Keep Correct banner visible briefly before chain check
+                  chainTimerRef.current = setTimeout(() => setPhase("chain"), 1800);
+                } else {
+                  wrong(surah.number, ayah.ayah);
+                }
+              }}
+            />
           </div>
 
           {phase === "study" ? (
