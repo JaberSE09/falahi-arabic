@@ -290,16 +290,36 @@ function MatchMode({ lesson, onFinish }: { lesson: typeof tutoringLessons[0]; on
             const isSel = leftSel === i;
             const isWrong = wrong?.l === i;
             return (
-              <button key={i} onClick={() => !isDone && setLeftSel(i)} disabled={isDone} style={{
-                padding: "clamp(12px,3.5vw,16px) 8px", borderRadius: 12, textAlign: "center",
-                border: `2px solid ${isDone ? "#10B981" : isWrong ? "#EF4444" : isSel ? lesson.color : "#ddd"}`,
-                background: isDone ? "#D1FAE5" : isWrong ? "#FEE2E2" : isSel ? `${lesson.color}20` : "white",
-                cursor: isDone ? "default" : "pointer", transition: "all 0.15s", opacity: isDone ? 0.55 : 1,
-                WebkitTapHighlightColor: "transparent",
-              }}>
-                <div className="arabic" style={{ fontSize: "clamp(22px, 6vw, 30px)", fontWeight: 700, color: isDone ? "#065F46" : "var(--navy)", lineHeight: 1.5 }}>{item.arabic}</div>
+              <div
+                key={i}
+                role="button"
+                tabIndex={isDone ? -1 : 0}
+                onClick={(e) => {
+                  if (isDone) return;
+                  if ((e.target as HTMLElement).closest("button")) return;
+                  setLeftSel(i);
+                }}
+                onKeyDown={(e) => {
+                  if (isDone) return;
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setLeftSel(i);
+                  }
+                }}
+                style={{
+                  padding: "clamp(12px,3.5vw,16px) 8px", borderRadius: 12, textAlign: "center",
+                  border: `2px solid ${isDone ? "#10B981" : isWrong ? "#EF4444" : isSel ? lesson.color : "#ddd"}`,
+                  background: isDone ? "#D1FAE5" : isWrong ? "#FEE2E2" : isSel ? `${lesson.color}20` : "white",
+                  cursor: isDone ? "default" : "pointer", transition: "all 0.15s", opacity: isDone ? 0.55 : 1,
+                  WebkitTapHighlightColor: "transparent",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                  <div className="arabic" style={{ fontSize: "clamp(22px, 6vw, 30px)", fontWeight: 700, color: isDone ? "#065F46" : "var(--navy)", lineHeight: 1.5 }}>{item.arabic}</div>
+                  <SpeakButton text={item.arabic} size="sm" />
+                </div>
                 <div style={{ fontSize: "clamp(10px,2.5vw,12px)", color: "#888", fontStyle: "italic", marginTop: 2 }}>{item.transliteration}</div>
-              </button>
+              </div>
             );
           })}
         </div>

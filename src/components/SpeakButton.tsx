@@ -69,7 +69,8 @@ export default function SpeakButton({ text, size = "md", className = "" }: Speak
         body: JSON.stringify({ text }),
       });
 
-      if (res.ok) {
+      const contentType = res.headers.get("content-type") ?? "";
+      if (res.ok && contentType.includes("audio")) {
         const blob = await res.blob();
         if (blob.size > 0) {
           const url = URL.createObjectURL(blob);

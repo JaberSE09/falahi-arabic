@@ -1,5 +1,5 @@
 // ─── Tutoring Data ───────────────────────────────────────────────────────────
-// All content from Sajid's study sheets — Palestinian dialect
+// All content from tutoring materials — Palestinian dialect
 
 export interface TutoringItem {
   arabic: string;

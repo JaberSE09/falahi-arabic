@@ -2,24 +2,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { vocabulary, categories, Word } from "@/lib/vocabulary";
 import SpeakButton from "@/components/SpeakButton";
-
-// ─── Persistence ─────────────────────────────────────────────────────────────
-const STORAGE_KEY = "falahi_learned_v1";
-
-function loadLearned(): Set<string> {
-  if (typeof window === "undefined") return new Set();
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return new Set(JSON.parse(raw) as string[]);
-  } catch { /* ignore */ }
-  return new Set();
-}
-
-function saveLearned(ids: Set<string>) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids]));
-  } catch { /* ignore */ }
-}
+import { useProgress } from "@/hooks/useProgress";
+import { getWordStatus } from "@/lib/progress";
 
 type FilterMode = "all" | "unlearned" | "learned";
 
@@ -217,16 +201,16 @@ export default function Flashcards() {
   const [selectedCat, setSelectedCat] = useState("All");
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
   const [index, setIndex] = useState(0);
-  const [learned, setLearned] = useState<Set<string>>(new Set());
   const [mounted, setMounted] = useState(false);
+  const { progress, correct, wrong, reset } = useProgress();
 
-  useEffect(() => { setLearned(loadLearned()); setMounted(true); }, []);
-  useEffect(() => { if (mounted) saveLearned(learned); }, [learned, mounted]);
+  useEffect(() => { setMounted(true); }, []);
 
   const baseWords = selectedCat === "All" ? vocabulary : vocabulary.filter(w => w.category === selectedCat);
+  const isKnown = (w: Word) => getWordStatus(progress, w.id) === "known";
   const words: Word[] =
-    filterMode === "unlearned" ? baseWords.filter(w => !learned.has(w.arabic)) :
-    filterMode === "learned"   ? baseWords.filter(w => learned.has(w.arabic)) :
+    filterMode === "unlearned" ? baseWords.filter(w => !isKnown(w)) :
+    filterMode === "learned"   ? baseWords.filter(w => isKnown(w)) :
     baseWords;
 
   const safeIndex = Math.min(index, Math.max(0, words.length - 1));
@@ -235,21 +219,23 @@ export default function Flashcards() {
   const handleFilter = (mode: FilterMode) => { setFilterMode(mode); setIndex(0); };
 
   const markLearned = useCallback(() => {
-    if (!words[safeIndex]) return;
-    setLearned(prev => new Set([...prev, words[safeIndex].arabic]));
-  }, [words, safeIndex]);
+    const w = words[safeIndex];
+    if (!w) return;
+    correct(w.id);
+  }, [words, safeIndex, correct]);
 
   const markUnlearned = useCallback(() => {
-    if (!words[safeIndex]) return;
-    setLearned(prev => { const next = new Set(prev); next.delete(words[safeIndex].arabic); return next; });
-  }, [words, safeIndex]);
+    const w = words[safeIndex];
+    if (!w) return;
+    wrong(w.id);
+  }, [words, safeIndex, wrong]);
 
   const resetAll = () => {
-    if (confirm("Reset all learned words? This cannot be undone.")) setLearned(new Set());
+    if (confirm("Reset all word progress? This cannot be undone.")) reset();
   };
 
-  const learnedInCat = baseWords.filter(w => learned.has(w.arabic)).length;
-  const unlearnedCount = baseWords.filter(w => !learned.has(w.arabic)).length;
+  const learnedInCat = baseWords.filter(w => isKnown(w)).length;
+  const unlearnedCount = baseWords.filter(w => !isKnown(w)).length;
 
   return (
     <div className="fade-in">
@@ -338,7 +324,7 @@ export default function Flashcards() {
           word={words[safeIndex]}
           index={safeIndex}
           total={words.length}
-          isLearned={learned.has(words[safeIndex].arabic)}
+          isLearned={isKnown(words[safeIndex]!)}
           onMarkLearned={markLearned}
           onMarkUnlearned={markUnlearned}
           onNext={() => setIndex(i => Math.min(i + 1, words.length - 1))}
@@ -348,3 +334,4 @@ export default function Flashcards() {
     </div>
   );
 }
+
