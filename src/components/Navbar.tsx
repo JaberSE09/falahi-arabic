@@ -31,8 +31,16 @@ const tutoringLinks = [
   { href: "/tutoring/lesson?id=wh-questions", label: "WH-Questions",  icon: "❓" },
   { href: "/tutoring/lesson?id=connectors",   label: "Connectors",    icon: "🔗" },
   { href: "/tutoring/lesson?id=time-range-1", label: "Time — Past",   icon: "⏰" },
-  { href: "/tutoring/lesson?id=time-range-2", label: "Time — To",     icon: "⏱️" },
-  { href: "/tutoring/lesson?id=plurals",      label: "Plural Forms",  icon: "🔢" },
+  { href: "/tutoring/lesson?id=time-range-2",        label: "Time — To",      icon: "⏱️" },
+  { href: "/tutoring/lesson?id=plurals",             label: "Plural Forms",   icon: "🔢" },
+  { href: "/tutoring/lesson?id=greetings",           label: "Greetings",      icon: "👋" },
+  { href: "/tutoring/lesson?id=how-are-you",         label: "How Are You",    icon: "🤝" },
+  { href: "/tutoring/lesson?id=family",              label: "Family",         icon: "👨‍👩‍👧" },
+  { href: "/tutoring/lesson?id=useful-expressions",  label: "Expressions",    icon: "💬" },
+  { href: "/tutoring/lesson?id=communication",       label: "Communication",  icon: "🗣️" },
+  { href: "/tutoring/lesson?id=food",                label: "Food & Drink",   icon: "🍽️" },
+  { href: "/tutoring/lesson?id=numbers",             label: "Numbers",        icon: "🔢" },
+  { href: "/tutoring/lesson?id=directions",          label: "Directions",     icon: "🗺️" },
 ];
 
 export default function Navbar() {
