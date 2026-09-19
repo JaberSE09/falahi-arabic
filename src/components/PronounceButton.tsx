@@ -4,6 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   bestPronunciationMatch,
   getSpeechRecognitionCtor,
+  listenMsForArabic,
+  normalizeArabic,
+  pronunciationMatches,
   type SpeechRecognitionLike,
 } from "@/lib/pronounce";
 
@@ -18,14 +21,69 @@ type Feedback =
 
 interface PronounceButtonProps {
   targetArabic: string;
+  /** Optional Latin/transliteration — helps when the mic returns English letters. */
+  targetTransliteration?: string;
   onResult?: (ok: boolean, heard: string) => void;
   size?: "md" | "lg";
 }
 
-const LISTEN_MS = 5000;
+function normalizeLatin(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ʿ|ʾ|'|`/g, "")
+    .replace(/[^a-z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function latinMatches(heard: string, transliteration: string): boolean {
+  const a = normalizeLatin(heard);
+  const b = normalizeLatin(transliteration);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  if (a.includes(b) || b.includes(a)) return true;
+  const aTok = a.split(" ").filter(Boolean);
+  const bTok = b.split(" ").filter(Boolean);
+  if (bTok.length === 0) return false;
+  let hit = 0;
+  for (const t of bTok) {
+    if (aTok.some((h) => h === t || (t.length >= 3 && (h.includes(t) || t.includes(h))))) {
+      hit += 1;
+    }
+  }
+  return hit / bTok.length >= 0.65;
+}
+
+function matchHeard(
+  alts: string[],
+  targetArabic: string,
+  targetTransliteration?: string,
+): { ok: boolean; heard: string } {
+  const primary = bestPronunciationMatch(alts, targetArabic);
+  if (primary.ok) return primary;
+
+  if (targetTransliteration) {
+    for (const alt of alts) {
+      const hasArabic = normalizeArabic(alt).length > 0;
+      if (!hasArabic && latinMatches(alt, targetTransliteration)) {
+        return { ok: true, heard: alt };
+      }
+      if (latinMatches(alt, targetTransliteration) && pronunciationMatches(alt, targetArabic) === false) {
+        // Mixed or latin-heavy transcripts
+        if (normalizeLatin(alt).length >= normalizeLatin(targetTransliteration).length * 0.5) {
+          return { ok: true, heard: alt };
+        }
+      }
+    }
+  }
+  return primary;
+}
 
 export default function PronounceButton({
   targetArabic,
+  targetTransliteration,
   onResult,
   size = "lg",
 }: PronounceButtonProps) {
@@ -92,24 +150,52 @@ export default function PronounceButton({
       const last = event.results[lastIdx];
       if (!last) return;
 
-      const alts: string[] = [];
+      const lastAlts: string[] = [];
       for (let i = 0; i < last.length; i++) {
         const t = last[i]?.transcript?.trim();
-        if (t) alts.push(t);
+        if (t) lastAlts.push(t);
       }
-      const primary = alts[0] ?? "";
+      const primary = lastAlts[0] ?? "";
 
       if (!last.isFinal) {
         setInterim(primary);
         return;
       }
 
+      // Collect every final alternative across the utterance
+      const alts: string[] = [];
+      const joinedParts: string[] = [];
+      for (let r = 0; r < event.results.length; r++) {
+        const res = event.results[r];
+        if (!res?.isFinal) continue;
+        const first = res[0]?.transcript?.trim();
+        if (first) joinedParts.push(first);
+        for (let i = 0; i < res.length; i++) {
+          const t = res[i]?.transcript?.trim();
+          if (t) alts.push(t);
+        }
+      }
+      if (joinedParts.length > 1) {
+        alts.unshift(joinedParts.join(" "));
+      }
+
       gotFinalRef.current = true;
       clearTimer();
-      const { ok, heard: bestHeard } = bestPronunciationMatch(alts, targetArabic);
+      const { ok, heard: bestHeard } = matchHeard(alts, targetArabic, targetTransliteration);
       setInterim("");
       setHeard(bestHeard);
       setFeedback(ok ? "right" : "wrong");
+      try {
+        if (typeof window !== "undefined" && "speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(ok ? "Correct!" : "Incorrect");
+          utter.lang = "en-US";
+          utter.rate = 1;
+          window.speechSynthesis.speak(utter);
+        }
+      } catch {
+        /* ignore TTS announce errors */
+      }
       onResult?.(ok, bestHeard);
     };
 
@@ -140,25 +226,26 @@ export default function PronounceButton({
 
     try {
       recog.start();
+      const ms = listenMsForArabic(targetArabic);
       timerRef.current = setTimeout(() => {
         try {
           recog.stop();
         } catch {
           /* ignore */
         }
-      }, LISTEN_MS);
+      }, ms);
     } catch {
       clearTimer();
       setFeedback("error");
     }
-  }, [clearTimer, onResult, targetArabic]);
+  }, [clearTimer, onResult, targetArabic, targetTransliteration]);
 
   const btnSize = size === "lg" ? 72 : 52;
   const label =
     feedback === "listening"
       ? interim
         ? `Hearing… ${interim}`
-        : "Listening…"
+        : "Listening… speak the line"
       : feedback === "right"
         ? "Correct!"
         : feedback === "wrong"
@@ -166,16 +253,28 @@ export default function PronounceButton({
           : feedback === "nohear"
             ? "Didn’t hear you — try again"
             : feedback === "unsupported"
-              ? "Mic not supported — use Chrome"
+              ? "Mic not supported — use Chrome or Edge"
               : feedback === "error"
                 ? "Mic error — try again"
                 : "Say it";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 12,
+        width: "100%",
+        background: "white",
+        borderRadius: 16,
+        padding: "18px 16px",
+        border: "2px solid #e8e0d0",
+      }}
+    >
       <button
         type="button"
-        aria-label="Say the Arabic word"
+        aria-label="Say the Arabic line"
         disabled={!supported && feedback === "unsupported"}
         onClick={() => {
           if (feedback === "listening") stop();
@@ -244,12 +343,16 @@ export default function PronounceButton({
           <div
             style={{
               fontWeight: 900,
-              fontSize: 22,
+              fontSize: 28,
               color: feedback === "right" ? "#2D7A4F" : "#e85d75",
-              marginBottom: feedback === "wrong" ? 12 : 0,
+              marginBottom: feedback === "wrong" ? 12 : 4,
+              letterSpacing: 0.3,
             }}
           >
             {feedback === "right" ? "Correct!" : "Incorrect"}
+          </div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "#555", marginBottom: feedback === "wrong" ? 12 : 0 }}>
+            {feedback === "right" ? "You said it right." : "Not a match — try again."}
           </div>
           {feedback === "wrong" && (
             <div
@@ -265,7 +368,7 @@ export default function PronounceButton({
                 <div style={{ fontSize: 13, fontWeight: 700, color: "#666", marginBottom: 4 }}>
                   Heard
                 </div>
-                <div className="arabic" style={{ fontSize: 28, color: "var(--navy)" }}>
+                <div className="arabic" style={{ fontSize: 26, color: "var(--navy)" }}>
                   {heard || "—"}
                 </div>
               </div>
@@ -273,7 +376,7 @@ export default function PronounceButton({
                 <div style={{ fontSize: 13, fontWeight: 700, color: "#666", marginBottom: 4 }}>
                   Expected
                 </div>
-                <div className="arabic" style={{ fontSize: 28, color: "var(--navy)" }}>
+                <div className="arabic" style={{ fontSize: 26, color: "var(--navy)" }}>
                   {targetArabic}
                 </div>
               </div>
