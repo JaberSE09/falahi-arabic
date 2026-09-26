@@ -1,160 +1,62 @@
+"use client";
 import Link from "next/link";
-import { lessons } from "@/lib/lessons";
+import { arabic101Lessons } from "@/lib/arabic101";
 
-const tools = [
-  { href: "/lessons", icon: "📖", title: "Lessons", desc: "7 beginner units with topic lists" },
-  { href: "/flashcards", icon: "🃏", title: "Flashcards", desc: "Flip cards and mark what you know" },
-  { href: "/phrases", icon: "💬", title: "Phrases", desc: "Browse all words with audio" },
-  { href: "/quiz", icon: "🎯", title: "Quiz", desc: "Multiple choice practice" },
-  { href: "/review", icon: "🔁", title: "Review", desc: "Due and missed words" },
-  { href: "/pronounce", icon: "🎙️", title: "Pronounce", desc: "Say words — Right or Wrong" },
-];
-
-export default function Arabic101Page() {
+export default function Arabic101Hub() {
   return (
-    <div className="fade-in">
-      <div
-        style={{
-          borderRadius: 24,
-          padding: "36px 24px",
-          marginBottom: 28,
-          background: "var(--navy)",
-          color: "white",
-        }}
-      >
-        <div
-          style={{
-            display: "inline-block",
-            fontSize: 13,
-            fontWeight: 800,
-            letterSpacing: 0.04,
-            color: "var(--gold-light)",
-            marginBottom: 12,
-            textTransform: "uppercase",
-          }}
-        >
-          Fall 2025
-        </div>
-        <h1
-          style={{
-            fontSize: "clamp(26px, 6vw, 36px)",
-            fontWeight: 800,
-            margin: "0 0 14px",
-            lineHeight: 1.25,
-            maxWidth: 640,
-          }}
-        >
-          Arabic 101: The Beginner&apos;s Guide to Learning Arabic
-        </h1>
-        <p
-          style={{
-            fontSize: "clamp(16px, 3vw, 19px)",
-            color: "rgba(255,255,255,0.82)",
-            lineHeight: 1.65,
-            margin: 0,
-            maxWidth: 560,
-          }}
-        >
-          A separate beginner path for Fall 2025 — syllabus, then study with flashcards, phrases, quiz, and games.
+    <div className="min-h-screen bg-[#0D1117] text-white">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-[#1D4ED8] to-[#1E293B] px-4 py-12 text-center">
+        <div className="text-5xl mb-3">📖</div>
+        <h1 className="text-3xl font-bold mb-2">Arabic 101</h1>
+        <p className="text-blue-200 text-sm font-medium uppercase tracking-widest mb-1">Miftaah Institute</p>
+        <p className="text-gray-300 text-base max-w-md mx-auto">
+          Nahw (Arabic Grammar) — from the foundations up. Study concepts, rules, and drill with answer keys.
         </p>
+        <div className="mt-4 flex justify-center gap-4 text-sm text-blue-200">
+          <span>📚 {arabic101Lessons.length} Lessons</span>
+          <span>✏️ {arabic101Lessons.reduce((a, l) => a + l.drills.length, 0)} Drills</span>
+          <span>📋 {arabic101Lessons.reduce((a, l) => a + l.rules.length, 0)} Rules</span>
+        </div>
       </div>
 
-      <section style={{ marginBottom: 36 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--navy)", margin: "0 0 14px" }}>
-          Study tools
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
-          {tools.map((t) => (
-            <Link key={t.href} href={t.href} style={{ textDecoration: "none" }}>
-              <div
-                style={{
-                  padding: "20px 16px",
-                  borderRadius: 16,
-                  background: "white",
-                  border: "2px solid #e8e0d0",
-                  height: "100%",
-                }}
-              >
-                <div style={{ fontSize: 28, marginBottom: 8 }} aria-hidden>
-                  {t.icon}
-                </div>
-                <div style={{ fontWeight: 800, fontSize: 17, color: "var(--navy)", marginBottom: 4 }}>{t.title}</div>
-                <div style={{ fontSize: 14, color: "#555", lineHeight: 1.45 }}>{t.desc}</div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Back link */}
+      <div className="px-4 pt-4">
+        <Link href="/" className="text-blue-400 text-sm hover:text-blue-300">← Back to Home</Link>
+      </div>
 
-      <section>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--navy)", margin: 0 }}>Syllabus</h2>
-          <Link href="/lessons" style={{ fontWeight: 700, fontSize: 15, color: "var(--gold)", textDecoration: "none" }}>
-            Open full lessons →
-          </Link>
-        </div>
-        <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-          {lessons.map((lesson, i) => (
-            <li
-              key={lesson.id}
-              style={{
-                background: "white",
-                border: "1px solid #e8e0d0",
-                borderRadius: 16,
-                padding: "18px 20px",
-              }}
+      {/* Lessons grid */}
+      <div className="px-4 py-6 max-w-2xl mx-auto grid gap-4">
+        {arabic101Lessons.map((lesson, i) => (
+          <Link key={lesson.id} href={`/arabic-101/lesson?id=${lesson.id}`}>
+            <div
+              className="rounded-xl p-5 flex items-start gap-4 cursor-pointer hover:opacity-90 transition-all active:scale-95"
+              style={{ backgroundColor: lesson.color + "22", border: `1.5px solid ${lesson.color}55` }}
             >
-              <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-                <div style={{ fontSize: 28, flexShrink: 0 }} aria-hidden>
-                  {lesson.emoji}
+              <div className="text-3xl flex-shrink-0">{lesson.emoji}</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: lesson.color }}>
+                    Lesson {i + 1}
+                  </span>
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 800, fontSize: 18, color: "var(--navy)", marginBottom: 6 }}>
-                    Unit {i + 1}: {lesson.title}
-                  </div>
-                  <p style={{ margin: "0 0 12px", fontSize: 15, color: "#555", lineHeight: 1.5 }}>{lesson.desc}</p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
-                    {lesson.topics.map((t) => (
-                      <span
-                        key={t}
-                        style={{
-                          padding: "6px 12px",
-                          borderRadius: 999,
-                          background: "var(--cream)",
-                          border: "1px solid #e8e0d0",
-                          fontSize: 15,
-                          color: "var(--navy)",
-                        }}
-                      >
-                        <span className="arabic" style={{ fontSize: 24 }}>
-                          {t.split(" — ")[0]}
-                        </span>
-                        {" — "}
-                        {t.split(" — ")[1]}
-                      </span>
-                    ))}
-                  </div>
-                  <Link
-                    href={`/flashcards?category=${encodeURIComponent(lesson.category)}`}
-                    style={{
-                      display: "inline-block",
-                      padding: "10px 18px",
-                      borderRadius: 10,
-                      background: "var(--navy)",
-                      color: "white",
-                      fontWeight: 700,
-                      fontSize: 14,
-                      textDecoration: "none",
-                    }}
-                  >
-                    Study this unit →
-                  </Link>
+                <h2 className="text-white font-bold text-lg leading-tight mb-1">{lesson.title}</h2>
+                <p className="text-gray-400 text-sm mb-3">{lesson.description}</p>
+                <div className="flex gap-3 text-xs text-gray-500">
+                  <span>📋 {lesson.concepts.length} concepts</span>
+                  <span>📌 {lesson.rules.length} rules</span>
+                  <span>✏️ {lesson.drills.length} drills</span>
                 </div>
               </div>
-            </li>
-          ))}
-        </ol>
-      </section>
+              <div className="text-gray-600 text-xl flex-shrink-0">›</div>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <div className="pb-12 text-center text-gray-600 text-xs px-4">
+        Content from Miftaah Institute — Arabic 101 Nahw & Sarf curriculum
+      </div>
     </div>
   );
 }
