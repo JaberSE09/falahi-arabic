@@ -1,5 +1,6 @@
 import type { Word } from "@/lib/vocabulary";
 import { vocabulary } from "@/lib/vocabulary";
+import { normalizeArabic } from "@/lib/pronounce";
 
 export type WordStatus = "known" | "learning";
 
@@ -70,7 +71,9 @@ function migrateLegacyLearned(map: ProgressMap): ProgressMap {
     const now = Date.now();
     for (const arabic of list) {
       if (typeof arabic !== "string") continue;
-      const word = vocabulary.find((w) => w.arabic === arabic);
+      const word = vocabulary.find(
+        (w) => normalizeArabic(w.arabic) === normalizeArabic(arabic),
+      );
       if (!word) continue;
       const key = String(word.id);
       if (next[key]) continue;
