@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { vocabulary, categories } from "@/lib/vocabulary";
-import SpeakButton from "@/components/SpeakButton";
+import ArabicForms from "@/components/ArabicForms";
 import { useProgress } from "@/hooks/useProgress";
 import { pickGapWords, shuffle, getProgress, getMissedWords, getDueWords } from "@/lib/progress";
 
@@ -271,15 +271,7 @@ function QuizInner() {
           {mode === "arToEn" ? "WHAT DOES THIS MEAN?" : "HOW DO YOU SAY THIS?"}
         </div>
         {mode === "arToEn" ? (
-          <>
-            <div className="arabic" style={{ fontSize: "clamp(48px, 12vw, 72px)", color: "var(--gold-light)", lineHeight: 1.6, marginBottom: 16 }}>
-              {word.arabic}
-            </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}>
-              <SpeakButton text={word.arabic} size="lg" />
-              <span style={{ fontSize: 16, fontStyle: "italic", color: "rgba(255,255,255,0.55)" }}>{word.transliteration}</span>
-            </div>
-          </>
+          <ArabicForms word={word} tone="light" size={word.arabicF ? 36 : 52} />
         ) : (
           <div style={{ fontSize: "clamp(24px, 6vw, 36px)", fontWeight: 800, color: "white", lineHeight: 1.3 }}>{word.english}</div>
         )}
@@ -325,10 +317,7 @@ function QuizInner() {
               {mode === "arToEn" ? (
                 opt.english
               ) : (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                  <SpeakButton text={opt.arabic} size="sm" />
-                  <span className="arabic" style={{ fontSize: "clamp(22px,5vw,30px)" }}>{opt.arabic}</span>
-                </div>
+                <ArabicForms word={opt} tone="dark" size={opt.arabicF ? 20 : 26} compact />
               )}
             </button>
           );

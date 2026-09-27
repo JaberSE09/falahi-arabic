@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { vocabulary, categories, Word } from "@/lib/vocabulary";
-import SpeakButton from "@/components/SpeakButton";
+import ArabicForms, { ExampleForms } from "@/components/ArabicForms";
 import { useProgress } from "@/hooks/useProgress";
 import { getWordStatus } from "@/lib/progress";
 
@@ -65,7 +65,7 @@ function FlashCard({
           if (e.target instanceof Element && e.target.closest("button")) return;
           setFlipped(f => !f);
         }}
-        style={{ width: "100%", maxWidth: 520, height: "min(320px, 60vw)", perspective: 1000, cursor: "pointer" }}
+        style={{ width: "100%", maxWidth: 520, height: word.arabicF ? "min(460px, 88vw)" : "min(320px, 60vw)", perspective: 1000, cursor: "pointer" }}
       >
         <div style={{
           position: "relative", width: "100%", height: "100%",
@@ -85,13 +85,8 @@ function FlashCard({
             boxShadow: isLearned ? "0 0 0 3px #4ade80" : "none",
             transition: "background 0.4s, box-shadow 0.4s",
           }}>
-            <div className="arabic" style={{ fontSize: "clamp(40px, 10vw, 64px)", color: "var(--gold-light)", marginBottom: 16, lineHeight: 1.5 }}>
-              {word.arabic}
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <SpeakButton text={word.arabic} size="lg" />
-              <span style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>tap card to reveal</span>
-            </div>
+            <ArabicForms word={word} tone="light" size={word.arabicF ? 36 : 52} />
+            <span style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", fontWeight: 500, marginTop: 8 }}>tap card to reveal</span>
           </div>
 
           {/* Back */}
@@ -104,15 +99,10 @@ function FlashCard({
             display: "flex", flexDirection: "column", alignItems: "center",
             justifyContent: "center", padding: 28, textAlign: "center",
           }}>
-            <div style={{ fontSize: "clamp(22px,5vw,30px)", fontWeight: 800, color: "white", marginBottom: 6, lineHeight: 1.3 }}>{word.english}</div>
-            <div style={{ fontSize: 18, fontStyle: "italic", color: "rgba(255,255,255,0.85)", marginBottom: 14 }}>{word.transliteration}</div>
+            <div style={{ fontSize: "clamp(22px,5vw,30px)", fontWeight: 800, color: "white", marginBottom: 10, lineHeight: 1.3 }}>{word.english}</div>
             {word.example && (
               <div style={{ padding: "10px 16px", borderRadius: 12, background: "rgba(255,255,255,0.3)", maxWidth: "100%" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 4 }}>
-                  <SpeakButton text={word.example} size="sm" />
-                  <span className="arabic" style={{ fontSize: 20, color: "white" }}>{word.example}</span>
-                </div>
-                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.85)", fontStyle: "italic" }}>{word.exampleTranslation}</div>
+                <ExampleForms word={word} tone="white" />
               </div>
             )}
           </div>
