@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { arabic101Lessons } from "@/lib/arabic101";
+import SpeakButton from "@/components/SpeakButton";
+import { arabicPhrases } from "@/components/VoicedArabic";
 
 export default function Arabic101Hub() {
   return (
@@ -27,31 +29,45 @@ export default function Arabic101Hub() {
 
       {/* Lessons grid */}
       <div className="px-4 py-6 max-w-2xl mx-auto grid gap-4">
-        {arabic101Lessons.map((lesson, i) => (
-          <Link key={lesson.id} href={`/arabic-101/lesson?id=${lesson.id}`}>
+        {arabic101Lessons.map((lesson, i) => {
+          const titleArabic = [...new Set([
+            ...arabicPhrases(lesson.title),
+            ...arabicPhrases(lesson.description),
+          ])].join(" ");
+          return (
             <div
-              className="rounded-xl p-5 flex items-start gap-4 cursor-pointer hover:opacity-90 transition-all active:scale-95"
+              key={lesson.id}
+              className="flex items-stretch overflow-hidden rounded-xl transition-all hover:opacity-90"
               style={{ backgroundColor: lesson.color + "22", border: `1.5px solid ${lesson.color}55` }}
             >
-              <div className="text-3xl flex-shrink-0">{lesson.emoji}</div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: lesson.color }}>
-                    Lesson {i + 1}
+              <Link href={`/arabic-101/lesson?id=${lesson.id}`} className="flex min-w-0 flex-1 items-start gap-4 p-5 active:scale-[0.99]">
+                <div className="flex-shrink-0 text-3xl">{lesson.emoji}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-widest" style={{ color: lesson.color }}>
+                      Lesson {i + 1}
+                    </span>
+                  </div>
+                  <h2 className="mb-1 text-lg font-bold leading-tight text-white">{lesson.title}</h2>
+                  <p className="mb-3 text-sm text-gray-400">{lesson.description}</p>
+                  <div className="flex gap-3 text-xs text-gray-500">
+                    <span>📋 {lesson.concepts.length} concepts</span>
+                    <span>📌 {lesson.rules.length} rules</span>
+                    <span>✏️ {lesson.drills.length} drills</span>
+                  </div>
+                </div>
+                <div className="flex-shrink-0 text-xl text-gray-600">›</div>
+              </Link>
+              {titleArabic && (
+                <div className="flex items-center pr-4">
+                  <span className="inline-flex rounded-full ring-2 ring-white/50">
+                    <SpeakButton text={titleArabic} size="md" />
                   </span>
                 </div>
-                <h2 className="text-white font-bold text-lg leading-tight mb-1">{lesson.title}</h2>
-                <p className="text-gray-400 text-sm mb-3">{lesson.description}</p>
-                <div className="flex gap-3 text-xs text-gray-500">
-                  <span>📋 {lesson.concepts.length} concepts</span>
-                  <span>📌 {lesson.rules.length} rules</span>
-                  <span>✏️ {lesson.drills.length} drills</span>
-                </div>
-              </div>
-              <div className="text-gray-600 text-xl flex-shrink-0">›</div>
+              )}
             </div>
-          </Link>
-        ))}
+          );
+        })}
       </div>
 
       <div className="pb-12 text-center text-gray-600 text-xs px-4">

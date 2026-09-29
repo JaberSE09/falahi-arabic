@@ -2,7 +2,8 @@
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { arabic101Lessons } from "@/lib/arabic101";
+import { arabic101Lessons, type Arabic101Item } from "@/lib/arabic101";
+import { ArabicLine, VoicedText, arabicPhrases } from "@/components/VoicedArabic";
 
 function LessonContent() {
   const params = useSearchParams();
@@ -58,8 +59,8 @@ function LessonContent() {
         style={{ background: `linear-gradient(135deg, ${lesson.color}33, #0D1117)` }}
       >
         <div className="text-4xl mb-2">{lesson.emoji}</div>
-        <h1 className="text-2xl font-bold text-white mb-1">{lesson.title}</h1>
-        <p className="text-gray-400 text-sm max-w-xs mx-auto">{lesson.description}</p>
+        <VoicedText text={lesson.title} className="mb-1 text-2xl font-bold text-white" />
+        <VoicedText text={lesson.description} className="mx-auto max-w-xs text-sm text-gray-400" />
       </div>
 
       {/* Tabs */}
@@ -83,27 +84,7 @@ function LessonContent() {
         {tab === "concepts" && (
           <div className="space-y-3">
             {lesson.concepts.map((item, i) => (
-              <div key={i} className="rounded-xl p-4" style={{ backgroundColor: lesson.color + "15", border: `1px solid ${lesson.color}33` }}>
-                <div className="flex items-start gap-3">
-                  <div className="flex-1">
-                    {item.arabic && (
-                      <div className="text-2xl font-bold text-right mb-1" dir="rtl" style={{ color: lesson.color, fontFamily: "serif" }}>
-                        {item.arabic}
-                      </div>
-                    )}
-                    <div className="font-bold text-white text-base">{item.term}</div>
-                    {item.transliteration && (
-                      <div className="text-gray-400 text-sm italic">{item.transliteration}</div>
-                    )}
-                    <div className="text-gray-300 text-sm mt-1">{item.english}</div>
-                    {item.note && (
-                      <div className="text-yellow-400 text-xs mt-2 bg-yellow-400/10 rounded-lg px-2 py-1">
-                        💡 {item.note}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <ConceptCard key={i} item={item} color={lesson.color} />
             ))}
           </div>
         )}
@@ -122,7 +103,7 @@ function LessonContent() {
                 >
                   {i + 1}
                 </div>
-                <p className="text-gray-200 text-sm leading-relaxed">{rule}</p>
+                <VoicedText text={rule} className="text-sm leading-relaxed text-gray-200" />
               </div>
             ))}
           </div>
@@ -148,12 +129,12 @@ function LessonContent() {
 
             {/* Question card */}
             <div className="rounded-2xl p-6 mb-4 bg-gray-900 border border-gray-800">
-              <p className="text-white font-semibold text-lg mb-3">{drill.question}</p>
-              {drill.arabic && (
-                <p className="text-3xl text-right font-bold mb-2" dir="rtl" style={{ color: lesson.color, fontFamily: "serif" }}>
-                  {drill.arabic}
-                </p>
-              )}
+              <VoicedText
+                text={drill.question}
+                skip={drill.arabic ? [drill.arabic] : []}
+                className="mb-3 text-lg font-semibold text-white"
+              />
+              {drill.arabic && <ArabicLine text={drill.arabic} color={lesson.color} large />}
 
               {!showAnswer ? (
                 <button
@@ -167,9 +148,9 @@ function LessonContent() {
                 <div className="mt-4">
                   <div className="rounded-xl p-4 mb-3" style={{ backgroundColor: lesson.color + "20", border: `1px solid ${lesson.color}44` }}>
                     <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">Answer</p>
-                    <p className="text-white font-bold text-base">{drill.answer}</p>
+                    <VoicedText text={drill.answer} className="text-base font-bold text-white" />
                     {drill.explanation && (
-                      <p className="text-gray-300 text-sm mt-2">💡 {drill.explanation}</p>
+                      <VoicedText text={`💡 ${drill.explanation}`} className="mt-2 text-sm text-gray-300" />
                     )}
                   </div>
                   {!answered ? (
@@ -228,6 +209,34 @@ function LessonContent() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function ConceptCard({ item, color }: { item: Arabic101Item; color: string }) {
+  const termSpoken = arabicPhrases(item.term).join(" ");
+  const termIsTheWord = !item.arabic && termSpoken.length > 0 && termSpoken === item.term.trim();
+  const termRepeatsArabic = Boolean(item.arabic && item.term.trim() === item.arabic.trim());
+
+  return (
+    <div className="rounded-xl p-4" style={{ backgroundColor: color + "15", border: `1px solid ${color}33` }}>
+      {item.arabic && <ArabicLine text={item.arabic} color={color} />}
+      {termRepeatsArabic ? null : termIsTheWord ? (
+        <ArabicLine text={item.term} color={color} />
+      ) : termSpoken ? (
+        <VoicedText text={item.term} skip={item.arabic ? [item.arabic] : []} className="text-base font-bold text-white" />
+      ) : (
+        <div className="text-base font-bold text-white">{item.term}</div>
+      )}
+      {item.transliteration && (
+        <div className="text-sm italic text-gray-400">{item.transliteration}</div>
+      )}
+      <div className="mt-1 text-sm text-gray-300">{item.english}</div>
+      {item.note && (
+        <div className="mt-2 rounded-lg bg-yellow-400/10 px-2 py-1 text-xs text-yellow-400">
+          <VoicedText text={`💡 ${item.note}`} />
+        </div>
+      )}
     </div>
   );
 }
