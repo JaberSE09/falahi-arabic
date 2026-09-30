@@ -60,7 +60,7 @@ export default function QuranLearnListPage() {
                 <div style={{ fontSize: 12, fontWeight: 800, color: "#888", letterSpacing: 0.4, marginBottom: 6 }}>
                   STEP {surah.order} · {surah.ayahCount} AYAH LINES
                 </div>
-                <div className="arabic" style={{ fontSize: 32, color: "var(--navy)", lineHeight: 1.25, marginBottom: 4 }}>
+                <div className="arabic arabic-read" style={{ color: "var(--navy)", marginBottom: 4 }}>
                   {surah.nameAr}
                 </div>
                 <div style={{ fontWeight: 800, fontSize: 18, color: "var(--navy)" }}>

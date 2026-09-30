@@ -71,7 +71,7 @@ export default function PronouncePage() {
               marginBottom: 24,
             }}
           >
-            <div className="arabic" style={{ fontSize: "clamp(52px, 14vw, 80px)", color: "var(--gold-light)", marginBottom: 12, lineHeight: 1.4 }}>
+            <div className="arabic arabic-hero" style={{ color: "var(--gold-light)", marginBottom: 12 }}>
               {word.arabic}
             </div>
             <div style={{ color: "rgba(255,255,255,0.65)", fontStyle: "italic", marginBottom: 14, fontSize: 18 }}>

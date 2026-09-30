@@ -65,7 +65,7 @@ function FlashCard({
           if (e.target instanceof Element && e.target.closest("button")) return;
           setFlipped(f => !f);
         }}
-        style={{ width: "100%", maxWidth: 520, height: word.arabicF ? "min(460px, 88vw)" : "min(320px, 60vw)", perspective: 1000, cursor: "pointer" }}
+        style={{ width: "100%", maxWidth: 520, height: word.arabicF ? "min(820px, 170vw)" : "min(520px, 110vw)", perspective: 1000, cursor: "pointer" }}
       >
         <div style={{
           position: "relative", width: "100%", height: "100%",
@@ -81,11 +81,11 @@ function FlashCard({
               ? "linear-gradient(135deg, #166534 0%, #15803d 100%)"
               : "var(--navy)",
             display: "flex", flexDirection: "column", alignItems: "center",
-            justifyContent: "center", padding: 28, textAlign: "center",
+            justifyContent: "center", padding: 28, textAlign: "center", overflow: "auto",
             boxShadow: isLearned ? "0 0 0 3px #4ade80" : "none",
             transition: "background 0.4s, box-shadow 0.4s",
           }}>
-            <ArabicForms word={word} tone="light" size={word.arabicF ? 36 : 52} />
+            <ArabicForms word={word} tone="light" scale="hero" />
             <span style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", fontWeight: 500, marginTop: 8 }}>tap card to reveal</span>
           </div>
 
@@ -97,7 +97,7 @@ function FlashCard({
               ? "linear-gradient(135deg, #4ade80 0%, #22c55e 100%)"
               : "var(--gold)",
             display: "flex", flexDirection: "column", alignItems: "center",
-            justifyContent: "center", padding: 28, textAlign: "center",
+            justifyContent: "center", padding: 28, textAlign: "center", overflow: "auto",
           }}>
             <div style={{ fontSize: "clamp(22px,5vw,30px)", fontWeight: 800, color: "white", marginBottom: 10, lineHeight: 1.3 }}>{word.english}</div>
             {word.example && (

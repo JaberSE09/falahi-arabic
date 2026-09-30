@@ -21,7 +21,7 @@ export default function Phrases() {
             {words.map((w, i) => (
               <div key={w.id} style={{ display: "flex", alignItems: "flex-start", gap: 16, padding: "18px 20px", borderTop: i>0 ? "1px solid #eee" : "none", flexWrap: "wrap" }}>
                 <div style={{ flex: "1 1 220px" }}>
-                  <ArabicForms word={w} tone="dark" size={w.arabicF ? 28 : 32} />
+                  <ArabicForms word={w} tone="dark" scale="read" />
                 </div>
                 <div style={{ flex: "1 1 200px", minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 18, color: "var(--navy)", lineHeight: 1.3 }}>{w.english}</div>

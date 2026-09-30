@@ -48,7 +48,7 @@ function StudyList({ lesson, mastered, onMaster }: { lesson: typeof tutoringLess
             {mastered.has(i) && <svg width={16} height={16} viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>}
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="arabic" style={{ fontSize: "clamp(24px, 6vw, 32px)", color: "var(--navy)", fontWeight: 700, marginBottom: 4, lineHeight: 1.6 }}>
+            <div className="arabic arabic-read" style={{ color: "var(--navy)", fontWeight: 700, marginBottom: 4 }}>
               {item.arabic}
             </div>
             <div style={{ fontSize: "clamp(13px, 3.5vw, 15px)", color: "#888", fontStyle: "italic", marginBottom: 4 }}>
@@ -120,7 +120,7 @@ function FlipCards({ lesson, mastered, onMaster }: { lesson: typeof tutoringLess
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
         style={{
-          width: "100%", minHeight: "clamp(240px, 55vw, 320px)", borderRadius: 24,
+          width: "100%", minHeight: "clamp(420px, 80vw, 640px)", borderRadius: 24,
           cursor: "pointer", userSelect: "none",
           background: flipped ? "white" : "var(--navy)",
           border: `3px solid ${flipped ? lesson.color : "transparent"}`,
@@ -133,7 +133,7 @@ function FlipCards({ lesson, mastered, onMaster }: { lesson: typeof tutoringLess
         {!flipped ? (
           <>
             <div style={{ fontSize: "clamp(11px,2.5vw,13px)", color: "rgba(255,255,255,0.4)", marginBottom: 14, letterSpacing: 1 }}>TAP TO REVEAL • SWIPE TO SKIP</div>
-            <div className="arabic" style={{ fontSize: "clamp(40px, 10vw, 56px)", color: "white", fontWeight: 700, marginBottom: 10, lineHeight: 1.5 }}>{item.arabic}</div>
+            <div className="arabic arabic-hero" style={{ color: "white", fontWeight: 700, marginBottom: 10 }}>{item.arabic}</div>
             <div style={{ fontSize: "clamp(15px,4vw,18px)", color: "rgba(255,255,255,0.65)", fontStyle: "italic", marginBottom: 18 }}>{item.transliteration}</div>
             <div onClick={e => e.stopPropagation()}><SpeakButton text={item.arabic} size="lg" /></div>
           </>
@@ -141,7 +141,7 @@ function FlipCards({ lesson, mastered, onMaster }: { lesson: typeof tutoringLess
           <>
             <div style={{ fontSize: "clamp(11px,2.5vw,13px)", color: lesson.color, marginBottom: 12, letterSpacing: 1, fontWeight: 700 }}>ENGLISH</div>
             <div style={{ fontSize: "clamp(22px, 6vw, 30px)", fontWeight: 800, color: "var(--navy)", marginBottom: 8, lineHeight: 1.3 }}>{item.english}</div>
-            <div className="arabic" style={{ fontSize: "clamp(26px, 7vw, 34px)", color: "#555", fontWeight: 700, marginBottom: 4, lineHeight: 1.5 }}>{item.arabic}</div>
+            <div className="arabic arabic-read" style={{ color: "#555", fontWeight: 700, marginBottom: 4 }}>{item.arabic}</div>
             <div style={{ fontSize: "clamp(13px, 3.5vw, 16px)", color: "#888", fontStyle: "italic", marginBottom: item.note ? 10 : 16 }}>{item.transliteration}</div>
             {item.note && <div style={{ fontSize: "clamp(12px,3vw,14px)", color: "#666", background: "#f5f5f5", padding: "6px 12px", borderRadius: 8, marginBottom: 16, lineHeight: 1.5 }}>💡 {item.note}</div>}
             <div onClick={e => e.stopPropagation()}><SpeakButton text={item.arabic} size="lg" /></div>
@@ -219,7 +219,7 @@ function QuizMode({ lesson, onFinish }: { lesson: typeof tutoringLessons[0]; onF
 
       <div style={{ textAlign: "center", marginBottom: 24, padding: "20px 16px", background: "var(--navy)", borderRadius: 20 }}>
         <div style={{ fontSize: "clamp(11px,2.5vw,13px)", color: "rgba(255,255,255,0.5)", marginBottom: 10, letterSpacing: 1 }}>WHAT DOES THIS MEAN?</div>
-        <div className="arabic" style={{ fontSize: "clamp(44px, 12vw, 56px)", color: "white", fontWeight: 700, marginBottom: 6, lineHeight: 1.5 }}>{q.item.arabic}</div>
+        <div className="arabic arabic-hero" style={{ color: "white", fontWeight: 700, marginBottom: 6 }}>{q.item.arabic}</div>
         <div style={{ fontSize: "clamp(14px,4vw,17px)", color: "rgba(255,255,255,0.65)", fontStyle: "italic", marginBottom: 12 }}>{q.item.transliteration}</div>
         <SpeakButton text={q.item.arabic} size="md" />
       </div>
@@ -315,7 +315,7 @@ function MatchMode({ lesson, onFinish }: { lesson: typeof tutoringLessons[0]; on
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                  <div className="arabic" style={{ fontSize: "clamp(22px, 6vw, 30px)", fontWeight: 700, color: isDone ? "#065F46" : "var(--navy)", lineHeight: 1.5 }}>{item.arabic}</div>
+                  <div className="arabic arabic-inline" style={{ fontWeight: 700, color: isDone ? "#065F46" : "var(--navy)" }}>{item.arabic}</div>
                   <SpeakButton text={item.arabic} size="sm" />
                 </div>
                 <div style={{ fontSize: "clamp(10px,2.5vw,12px)", color: "#888", fontStyle: "italic", marginTop: 2 }}>{item.transliteration}</div>

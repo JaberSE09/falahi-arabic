@@ -30,7 +30,23 @@ button { font-size: 1rem; }
 .arabic {
   font-family: var(--font-amiri), serif;
   direction: rtl;
-  line-height: 2;
+  font-size: clamp(44px, 9vw, 64px);
+  line-height: 1.7;
+}
+
+.arabic-hero {
+  font-size: clamp(72px, 16vw, 112px);
+  line-height: 1.45;
+}
+
+.arabic-read {
+  font-size: clamp(44px, 9vw, 64px);
+  line-height: 1.7;
+}
+
+.arabic-inline {
+  font-size: clamp(32px, 7vw, 44px);
+  line-height: 1.6;
 }
 
 @keyframes fadeIn {
