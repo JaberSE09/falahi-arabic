@@ -34,7 +34,7 @@ export default function Home() {
     <div className="fade-in">
       {/* Hero */}
       <div style={{ textAlign: "center", padding: "44px 24px 40px", marginBottom: 28, borderRadius: 24, background: "var(--navy)", color: "white" }}>
-        <div className="arabic" style={{ fontSize: 64, color: "var(--gold-light)", marginBottom: 10 }}>فلاحي</div>
+        <div className="arabic arabic-hero" style={{ color: "var(--gold-light)", marginBottom: 10 }}>فلاحي</div>
         <h1 style={{ fontSize: "clamp(24px, 6vw, 34px)", fontWeight: 800, marginBottom: 12, margin: "0 0 12px", lineHeight: 1.3 }}>Learn Arabic — Two Ways</h1>
         <p style={{ fontSize: "clamp(16px, 3vw, 20px)", color: "rgba(255,255,255,0.8)", marginBottom: 28, lineHeight: 1.6, maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
           Palestinian dialect for daily life · Quranic Arabic for Islamic learning

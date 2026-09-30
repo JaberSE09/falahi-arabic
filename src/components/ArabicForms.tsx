@@ -4,12 +4,19 @@ import SpeakButton from "@/components/SpeakButton";
 import type { Word } from "@/lib/vocabulary";
 
 type Tone = "light" | "dark" | "white";
+type Scale = "hero" | "read" | "inline";
+
+const scaleClass: Record<Scale, string> = {
+  hero: "arabic arabic-hero",
+  read: "arabic arabic-read",
+  inline: "arabic arabic-inline",
+};
 
 interface ArabicFormsProps {
   word: Pick<Word, "arabic" | "transliteration" | "arabicF" | "transliterationF">;
   tone?: Tone;
-  size?: number;
-  /** Stack male and female. Compact keeps them on one tighter block for quiz options. */
+  scale?: Scale;
+  /** Stack male and female. Compact uses the inline size for quiz options. */
   compact?: boolean;
 }
 
@@ -24,13 +31,13 @@ function Line({
   arabic,
   transliteration,
   tone,
-  size,
+  scale,
 }: {
   label?: string;
   arabic: string;
   transliteration?: string;
   tone: Tone;
-  size: number;
+  scale: Scale;
 }) {
   const colors = toneColor[tone];
   return (
@@ -41,13 +48,13 @@ function Line({
         </div>
       )}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
-        <span className="arabic" style={{ fontSize: size, color: colors.text, lineHeight: 1.6 }}>
+        <span className={scaleClass[scale]} style={{ color: colors.text }}>
           {arabic}
         </span>
-        <SpeakButton text={arabic} size={size >= 36 ? "lg" : "sm"} />
+        <SpeakButton text={arabic} size={scale === "inline" ? "sm" : "lg"} />
       </div>
       {transliteration && (
-        <div style={{ fontSize: Math.max(13, Math.round(size * 0.38)), fontStyle: "italic", color: colors.trans }}>
+        <div style={{ fontSize: scale === "inline" ? 14 : 18, fontStyle: "italic", color: colors.trans }}>
           {transliteration}
         </div>
       )}
@@ -55,16 +62,16 @@ function Line({
   );
 }
 
-export default function ArabicForms({ word, tone = "dark", size = 36, compact = false }: ArabicFormsProps) {
+export default function ArabicForms({ word, tone = "dark", scale = "read", compact = false }: ArabicFormsProps) {
+  const lineScale: Scale = compact ? "inline" : scale;
   if (!word.arabicF) {
-    return <Line arabic={word.arabic} transliteration={word.transliteration} tone={tone} size={size} />;
+    return <Line arabic={word.arabic} transliteration={word.transliteration} tone={tone} scale={lineScale} />;
   }
 
-  const lineSize = compact ? Math.max(18, size - 8) : size;
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: compact ? 8 : 14, width: "100%" }}>
-      <Line label="Male" arabic={word.arabic} transliteration={word.transliteration} tone={tone} size={lineSize} />
-      <Line label="Female" arabic={word.arabicF} transliteration={word.transliterationF} tone={tone} size={lineSize} />
+      <Line label="Male" arabic={word.arabic} transliteration={word.transliteration} tone={tone} scale={lineScale} />
+      <Line label="Female" arabic={word.arabicF} transliteration={word.transliterationF} tone={tone} scale={lineScale} />
     </div>
   );
 }
@@ -85,13 +92,13 @@ export function ExampleForms({
           <span style={{ fontSize: 11, fontWeight: 800, color: colors.label, textTransform: "uppercase" }}>Male</span>
         )}
         <SpeakButton text={word.example} size="sm" />
-        <span className="arabic" style={{ fontSize: 18, color: colors.text, lineHeight: 1.6 }}>{word.example}</span>
+        <span className="arabic arabic-read" style={{ color: colors.text }}>{word.example}</span>
       </div>
       {word.exampleF && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
           <span style={{ fontSize: 11, fontWeight: 800, color: colors.label, textTransform: "uppercase" }}>Female</span>
           <SpeakButton text={word.exampleF} size="sm" />
-          <span className="arabic" style={{ fontSize: 18, color: colors.text, lineHeight: 1.6 }}>{word.exampleF}</span>
+          <span className="arabic arabic-read" style={{ color: colors.text }}>{word.exampleF}</span>
         </div>
       )}
       {word.exampleTranslation && (

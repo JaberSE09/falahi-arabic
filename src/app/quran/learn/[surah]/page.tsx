@@ -86,7 +86,7 @@ export default function QuranSurahLearnPage() {
 
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 8 }}>
         <div>
-          <div className="arabic" style={{ fontSize: 36, color: "var(--navy)", lineHeight: 1.2 }}>
+          <div className="arabic arabic-read" style={{ color: "var(--navy)" }}>
             {surah.nameAr}
           </div>
           <div style={{ fontWeight: 800, fontSize: 20, color: "var(--navy)" }}>
@@ -213,13 +213,10 @@ export default function QuranSurahLearnPage() {
                   {surah.nameEn} {a.ayah}
                 </div>
                 <div
-                  className="arabic"
+                  className="arabic arabic-read"
                   style={{
-                    fontSize: 28,
-                    lineHeight: 1.8,
                     color: "var(--navy)",
                     textAlign: "right",
-                    direction: "rtl",
                     marginBottom: 8,
                   }}
                 >
@@ -291,13 +288,10 @@ export default function QuranSurahLearnPage() {
             {phase === "study" ? (
               <>
                 <div
-                  className="arabic"
+                  className="arabic arabic-hero"
                   style={{
-                    fontSize: "clamp(36px, 9vw, 52px)",
-                    lineHeight: 1.7,
                     color: "var(--gold-light)",
                     marginBottom: 14,
-                    direction: "rtl",
                   }}
                 >
                   {ayah.arabic}

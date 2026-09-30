@@ -200,12 +200,12 @@ function ReviewInner() {
               textAlign: "center",
               marginBottom: 18,
               cursor: "pointer",
-              minHeight: 220,
+              minHeight: 320,
             }}
           >
             {!flipped ? (
               <>
-                <div className="arabic" style={{ fontSize: "clamp(48px, 12vw, 72px)", color: "var(--gold-light)", marginBottom: 16, lineHeight: 1.4 }}>
+                <div className="arabic arabic-hero" style={{ color: "var(--gold-light)", marginBottom: 16 }}>
                   {word.arabic}
                 </div>
                 <div style={{ display: "flex", justifyContent: "center", gap: 12, alignItems: "center" }}>

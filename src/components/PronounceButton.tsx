@@ -368,7 +368,7 @@ export default function PronounceButton({
                 <div style={{ fontSize: 13, fontWeight: 700, color: "#666", marginBottom: 4 }}>
                   Heard
                 </div>
-                <div className="arabic" style={{ fontSize: 26, color: "var(--navy)" }}>
+                <div className="arabic arabic-read" style={{ color: "var(--navy)" }}>
                   {heard || "—"}
                 </div>
               </div>
@@ -376,7 +376,7 @@ export default function PronounceButton({
                 <div style={{ fontSize: 13, fontWeight: 700, color: "#666", marginBottom: 4 }}>
                   Expected
                 </div>
-                <div className="arabic" style={{ fontSize: 26, color: "var(--navy)" }}>
+                <div className="arabic arabic-read" style={{ color: "var(--navy)" }}>
                   {targetArabic}
                 </div>
               </div>
@@ -384,7 +384,7 @@ export default function PronounceButton({
           )}
           {feedback === "right" && heard && (
             <div style={{ marginTop: 8, fontSize: 15, color: "#555" }}>
-              Heard: <span className="arabic" style={{ fontSize: 22 }}>{heard}</span>
+              Heard: <span className="arabic arabic-inline">{heard}</span>
             </div>
           )}
         </div>

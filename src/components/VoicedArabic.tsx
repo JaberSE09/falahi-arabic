@@ -47,9 +47,9 @@ export function ArabicLine({
   large?: boolean;
 }) {
   return (
-    <div className="mb-1 flex items-center justify-end gap-2">
+    <div className="mb-1 flex flex-wrap items-center justify-end gap-2">
       <Listen text={text} size={large ? "md" : "sm"} />
-      <div className={`arabic font-bold ${large ? "text-3xl" : "text-2xl"}`} style={{ color }}>
+      <div className={`arabic font-bold ${large ? "arabic-hero" : "arabic-read"}`} style={{ color }}>
         {text}
       </div>
     </div>
@@ -73,7 +73,7 @@ export function VoicedText({
       {parts.map((part, index) =>
         part.speak && !skipSet.has(part.speak) ? (
           <span key={index} className="mx-0.5 inline-flex items-center gap-1 align-middle">
-            <span className="arabic font-bold">{part.text}</span>
+            <span className="arabic arabic-read font-bold">{part.text}</span>
             <Listen text={part.speak} size="sm" />
           </span>
         ) : (

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Amiri, Inter } from "next/font/google";
+import { Inter, Scheherazade_New } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 
@@ -9,10 +9,10 @@ const inter = Inter({
   display: "swap",
 });
 
-const amiri = Amiri({
+const arabic = Scheherazade_New({
   subsets: ["arabic", "latin"],
   weight: ["400", "700"],
-  variable: "--font-amiri",
+  variable: "--font-arabic",
   display: "swap",
 });
 
@@ -29,7 +29,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${amiri.variable}`}>
+    <html lang="en" className={`${inter.variable} ${arabic.variable}`}>
       <body style={{ minHeight: "100vh", background: "var(--cream)" }}>
         <Navbar />
         <main style={{ maxWidth: 900, margin: "0 auto", padding: "20px 16px 48px" }}>

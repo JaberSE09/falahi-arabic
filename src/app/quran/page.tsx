@@ -125,7 +125,7 @@ export default function QuranPage() {
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#888", marginBottom: 4 }}>
                       #{surah.order} · Surah {surah.number} · {surah.ayahCount} lines
                     </div>
-                    <div className="arabic" style={{ fontSize: 28, color: "var(--navy)", lineHeight: 1.3 }}>
+                    <div className="arabic arabic-read" style={{ color: "var(--navy)" }}>
                       {surah.nameAr}
                     </div>
                     <div style={{ fontWeight: 800, color: "var(--navy)", fontSize: 17 }}>{surah.nameEn}</div>
@@ -260,13 +260,10 @@ export default function QuranPage() {
                     <SpeakButton text={v.arabic} size="md" />
                   </div>
                   <div
-                    className="arabic"
+                    className="arabic arabic-read"
                     style={{
-                      fontSize: 34,
-                      lineHeight: 2.2,
                       color: "var(--navy)",
                       textAlign: "right",
-                      direction: "rtl",
                       marginBottom: 12,
                       fontWeight: 400,
                     }}

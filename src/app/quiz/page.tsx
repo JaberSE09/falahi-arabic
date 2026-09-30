@@ -271,7 +271,7 @@ function QuizInner() {
           {mode === "arToEn" ? "WHAT DOES THIS MEAN?" : "HOW DO YOU SAY THIS?"}
         </div>
         {mode === "arToEn" ? (
-          <ArabicForms word={word} tone="light" size={word.arabicF ? 36 : 52} />
+          <ArabicForms word={word} tone="light" scale="hero" />
         ) : (
           <div style={{ fontSize: "clamp(24px, 6vw, 36px)", fontWeight: 800, color: "white", lineHeight: 1.3 }}>{word.english}</div>
         )}
@@ -317,7 +317,7 @@ function QuizInner() {
               {mode === "arToEn" ? (
                 opt.english
               ) : (
-                <ArabicForms word={opt} tone="dark" size={opt.arabicF ? 20 : 26} compact />
+                <ArabicForms word={opt} tone="dark" scale="inline" compact />
               )}
             </button>
           );
