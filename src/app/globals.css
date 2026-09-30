@@ -28,7 +28,7 @@ p, li, span, div { font-size: inherit; }
 button { font-size: 1rem; }
 
 .arabic {
-  font-family: var(--font-amiri), serif;
+  font-family: var(--font-arabic), "Scheherazade New", serif;
   direction: rtl;
   font-size: clamp(44px, 9vw, 64px);
   line-height: 1.7;
