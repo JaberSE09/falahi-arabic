@@ -60,26 +60,31 @@ export function VoicedText({
   text,
   className,
   skip = [],
+  as = "p",
+  speak = true,
 }: {
   text: string;
   className?: string;
   skip?: string[];
+  as?: "p" | "span";
+  speak?: boolean;
 }) {
   const skipSet = new Set(skip.map((phrase) => phrase.trim()).filter(Boolean));
   const parts = splitVoiced(text);
+  const Tag = as;
 
   return (
-    <p className={className}>
+    <Tag className={className}>
       {parts.map((part, index) =>
         part.speak && !skipSet.has(part.speak) ? (
           <span key={index} className="mx-0.5 inline-flex items-center gap-1 align-middle">
             <span className="arabic arabic-read font-bold">{part.text}</span>
-            <Listen text={part.speak} size="sm" />
+            {speak && <Listen text={part.speak} size="sm" />}
           </span>
         ) : (
           <span key={index}>{part.text}</span>
         ),
       )}
-    </p>
+    </Tag>
   );
 }
