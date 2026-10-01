@@ -3,6 +3,7 @@ import { vocabulary } from "@/lib/vocabulary";
 import { duas, hadiths } from "@/lib/islamic";
 import { quranSurahs } from "@/lib/quranSurahs";
 import ProgressHint from "@/components/ProgressHint";
+import IslamicContinue from "@/components/IslamicContinue";
 
 const palestinianFeatures = [
   { href: "/review",     icon: "🔁", title: "Review",     desc: "Due today and words you missed" },
@@ -23,10 +24,10 @@ const tutoringFeatures = [
   { href: "/tutoring/lesson?id=plurals",      icon: "🔢", title: "Plural Forms",      desc: "Days, weeks, months, years, seasons" },
 ];
 
-const islamicFeatures = [
-  { href: "/quran",  icon: "📖", title: "Quran", desc: "Short surahs, ayah by ayah — listen, recall, chain" },
-  { href: "/dua",    icon: "🤲", title: "Daily Duas",   desc: "Duas with when and how to say them" },
-  { href: "/hadith", icon: "📿", title: "Hadith",       desc: "Prophetic narrations with translation" },
+const islamicLinks = [
+  { href: "/quran", icon: "📖", title: "Quran path" },
+  { href: "/dua", icon: "🤲", title: "Daily Duas" },
+  { href: "/hadith", icon: "📿", title: "Hadith" },
 ];
 
 export default function Home() {
@@ -88,14 +89,24 @@ export default function Home() {
           <div style={{ width: 6, height: 30, borderRadius: 4, background: "var(--green)", flexShrink: 0 }} />
           <h2 style={{ fontSize: "clamp(20px,4vw,26px)", fontWeight: 800, color: "var(--navy)", margin: 0 }}>☪️ Islamic Arabic</h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 12 }}>
-          {islamicFeatures.map(f => (
-            <Link key={f.href} href={f.href} style={{ textDecoration: "none" }}>
-              <div style={{ padding: "22px 18px", borderRadius: 16, background: "white", border: "2px solid #ddd", height: "100%" }}>
-                <div style={{ fontSize: 32, marginBottom: 10 }}>{f.icon}</div>
-                <div style={{ fontWeight: 800, fontSize: 18, color: "var(--navy)", marginBottom: 6 }}>{f.title}</div>
-                <div style={{ fontSize: 15, color: "#555", lineHeight: 1.5 }}>{f.desc}</div>
-              </div>
+        <IslamicContinue />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+          {islamicLinks.map((f) => (
+            <Link
+              key={f.href}
+              href={f.href}
+              style={{
+                textDecoration: "none",
+                padding: "12px 16px",
+                borderRadius: 12,
+                background: "white",
+                border: "2px solid #ddd",
+                fontWeight: 800,
+                color: "var(--navy)",
+                fontSize: 15,
+              }}
+            >
+              {f.icon} {f.title}
             </Link>
           ))}
         </div>

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   countPathProgress,
+  getContinueTarget,
   getDueAyahs,
   getQuranProgress,
   getSurahProgress,
@@ -37,6 +38,7 @@ export function useQuranProgress() {
   }, []);
 
   const counts = useMemo(() => countPathProgress(progress), [progress]);
+  const continueTarget = useMemo(() => getContinueTarget(progress), [progress]);
 
   const surahSummary = useCallback(
     (surah: QuranSurah) => getSurahProgress(surah, progress),
@@ -66,6 +68,7 @@ export function useQuranProgress() {
     reset,
     refresh,
     counts,
+    continueTarget,
     surahSummary,
     dueInSurah,
     path,

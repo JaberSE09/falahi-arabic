@@ -37,25 +37,42 @@ export interface Dua {
   transliteration: string;
   english: string;
   when: string;
+  group: DuaGroup;
   source?: string;
 }
 
+export const duaGroupOrder = [
+  "Wake",
+  "Going out",
+  "Salah",
+  "Meals",
+  "Evening",
+  "Sleep",
+  "When you need them",
+] as const;
+
+export type DuaGroup = (typeof duaGroupOrder)[number];
+
+export function duaIsShort(arabic: string): boolean {
+  return arabic.trim().split(/\s+/).filter(Boolean).length <= 5;
+}
+
 export const duas: Dua[] = [
-  { id: 1,  title: "Before eating",         arabic: "بِسْمِ اللَّهِ",                                                   transliteration: "Bismillāh",                                               english: "In the name of Allah",                                           when: "Before every meal", source: "Abu Dawud" },
-  { id: 2,  title: "After eating",          arabic: "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَٰذَا وَرَزَقَنِيهِ",   transliteration: "Al-ḥamdu lillāhi lladhī aṭʿamanī hādhā wa-razaqanīh",    english: "Praise be to Allah who fed me this and provided it for me",       when: "After eating", source: "Tirmidhi" },
-  { id: 3,  title: "Morning dhikr",         arabic: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ",                      transliteration: "Aṣbaḥnā wa-aṣbaḥa l-mulku lillāh",                       english: "We enter the morning and all dominion belongs to Allah",          when: "Every morning", source: "Muslim" },
-  { id: 4,  title: "Evening dhikr",         arabic: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ",                      transliteration: "Amsaynā wa-amsa l-mulku lillāh",                          english: "We enter the evening and all dominion belongs to Allah",          when: "Every evening", source: "Muslim" },
-  { id: 5,  title: "Entering home",         arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلَجِ وَخَيْرَ الْمَخْرَجِ", transliteration: "Allāhumma innī asʾaluka khayra l-mawlaji wa-khayra l-makhraj", english: "O Allah, I ask You for the best of entry and the best of exit", when: "When entering home", source: "Abu Dawud" },
-  { id: 6,  title: "Leaving home",          arabic: "بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", transliteration: "Bismillāh, tawakkaltu ʿala llāh, wa-lā ḥawla wa-lā quwwata illā billāh", english: "In the name of Allah, I trust in Allah, there is no power except with Allah", when: "When leaving home", source: "Abu Dawud" },
-  { id: 7,  title: "Before sleeping",       arabic: "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا",                       transliteration: "Allāhumma bi-smika amūtu wa-aḥyā",                        english: "O Allah, in Your name I die and I live",                          when: "Before sleeping", source: "Bukhari" },
-  { id: 8,  title: "Waking up",             arabic: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا",  transliteration: "Al-ḥamdu lillāhi lladhī aḥyānā baʿda mā amātanā",        english: "Praise be to Allah who gave us life after causing us to die",     when: "Upon waking", source: "Bukhari" },
-  { id: 9,  title: "For anxiety",           arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ",   transliteration: "Allāhumma innī aʿūdhu bika min al-hammi wa-l-ḥazan",      english: "O Allah, I seek refuge in You from worry and sadness",           when: "When anxious or sad", source: "Bukhari" },
-  { id: 10, title: "For forgiveness",       arabic: "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ",                             transliteration: "Rabbi ghfir lī wa-tub ʿalayy",                            english: "My Lord, forgive me and accept my repentance",                   when: "Seeking forgiveness", source: "Abu Dawud" },
-  { id: 11, title: "Istikhara opening",     arabic: "اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ",                  transliteration: "Allāhumma innī astakhīruka bi-ʿilmik",                    english: "O Allah, I seek Your guidance through Your knowledge",            when: "Before making a decision", source: "Bukhari" },
-  { id: 12, title: "Entering mosque",       arabic: "اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",                 transliteration: "Allāhumma ftaḥ lī abwāba raḥmatik",                       english: "O Allah, open for me the gates of Your mercy",                   when: "When entering the mosque", source: "Muslim" },
-  { id: 13, title: "After adhan",           arabic: "اللَّهُمَّ رَبَّ هَٰذِهِ الدَّعْوَةِ التَّامَّةِ",            transliteration: "Allāhumma rabba hādhihi d-daʿwati t-tāmma",               english: "O Allah, Lord of this perfect call",                             when: "After hearing the adhan", source: "Bukhari" },
-  { id: 14, title: "When sneezing",         arabic: "الْحَمْدُ لِلَّهِ",                                            transliteration: "Al-ḥamdu lillāh",                                         english: "Praise be to Allah",                                             when: "After sneezing", source: "Bukhari" },
-  { id: 15, title: "Reply to sneeze",       arabic: "يَرْحَمُكَ اللَّهُ",                                           transliteration: "Yarḥamuka llāh",                                          english: "May Allah have mercy on you",                                    when: "When someone sneezes", source: "Bukhari" },
+  { id: 8,  title: "Waking up",             arabic: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا",  transliteration: "Al-ḥamdu lillāhi lladhī aḥyānā baʿda mā amātanā",        english: "Praise be to Allah who gave us life after causing us to die",     when: "Upon waking", group: "Wake", source: "Bukhari" },
+  { id: 3,  title: "Morning dhikr",         arabic: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ",                      transliteration: "Aṣbaḥnā wa-aṣbaḥa l-mulku lillāh",                       english: "We enter the morning and all dominion belongs to Allah",          when: "Every morning", group: "Wake", source: "Muslim" },
+  { id: 6,  title: "Leaving home",          arabic: "بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", transliteration: "Bismillāh, tawakkaltu ʿala llāh, wa-lā ḥawla wa-lā quwwata illā billāh", english: "In the name of Allah, I trust in Allah, there is no power except with Allah", when: "When leaving home", group: "Going out", source: "Abu Dawud" },
+  { id: 12, title: "Entering mosque",       arabic: "اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",                 transliteration: "Allāhumma ftaḥ lī abwāba raḥmatik",                       english: "O Allah, open for me the gates of Your mercy",                   when: "When entering the mosque", group: "Salah", source: "Muslim" },
+  { id: 13, title: "After adhan",           arabic: "اللَّهُمَّ رَبَّ هَٰذِهِ الدَّعْوَةِ التَّامَّةِ",            transliteration: "Allāhumma rabba hādhihi d-daʿwati t-tāmma",               english: "O Allah, Lord of this perfect call",                             when: "After hearing the adhan", group: "Salah", source: "Bukhari" },
+  { id: 1,  title: "Before eating",         arabic: "بِسْمِ اللَّهِ",                                                   transliteration: "Bismillāh",                                               english: "In the name of Allah",                                           when: "Before every meal", group: "Meals", source: "Abu Dawud" },
+  { id: 2,  title: "After eating",          arabic: "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَٰذَا وَرَزَقَنِيهِ",   transliteration: "Al-ḥamdu lillāhi lladhī aṭʿamanī hādhā wa-razaqanīh",    english: "Praise be to Allah who fed me this and provided it for me",       when: "After eating", group: "Meals", source: "Tirmidhi" },
+  { id: 4,  title: "Evening dhikr",         arabic: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ",                      transliteration: "Amsaynā wa-amsa l-mulku lillāh",                          english: "We enter the evening and all dominion belongs to Allah",          when: "Every evening", group: "Evening", source: "Muslim" },
+  { id: 5,  title: "Entering home",         arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلَجِ وَخَيْرَ الْمَخْرَجِ", transliteration: "Allāhumma innī asʾaluka khayra l-mawlaji wa-khayra l-makhraj", english: "O Allah, I ask You for the best of entry and the best of exit", when: "When entering home", group: "Evening", source: "Abu Dawud" },
+  { id: 7,  title: "Before sleeping",       arabic: "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا",                       transliteration: "Allāhumma bi-smika amūtu wa-aḥyā",                        english: "O Allah, in Your name I die and I live",                          when: "Before sleeping", group: "Sleep", source: "Bukhari" },
+  { id: 9,  title: "For anxiety",           arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ",   transliteration: "Allāhumma innī aʿūdhu bika min al-hammi wa-l-ḥazan",      english: "O Allah, I seek refuge in You from worry and sadness",           when: "When anxious or sad", group: "When you need them", source: "Bukhari" },
+  { id: 10, title: "For forgiveness",       arabic: "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ",                             transliteration: "Rabbi ghfir lī wa-tub ʿalayy",                            english: "My Lord, forgive me and accept my repentance",                   when: "Seeking forgiveness", group: "When you need them", source: "Abu Dawud" },
+  { id: 11, title: "Istikhara opening",     arabic: "اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ",                  transliteration: "Allāhumma innī astakhīruka bi-ʿilmik",                    english: "O Allah, I seek Your guidance through Your knowledge",            when: "Before making a decision", group: "When you need them", source: "Bukhari" },
+  { id: 14, title: "When sneezing",         arabic: "الْحَمْدُ لِلَّهِ",                                            transliteration: "Al-ḥamdu lillāh",                                         english: "Praise be to Allah",                                             when: "After sneezing", group: "When you need them", source: "Bukhari" },
+  { id: 15, title: "Reply to sneeze",       arabic: "يَرْحَمُكَ اللَّهُ",                                           transliteration: "Yarḥamuka llāh",                                          english: "May Allah have mercy on you",                                    when: "When someone sneezes", group: "When you need them", source: "Bukhari" },
 ];
 
 // ─── Hadiths ─────────────────────────────────────────────────────────────────

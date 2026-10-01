@@ -7,13 +7,11 @@ import StudySet, { type StudyCard } from "@/components/StudySet";
 import SpeakButton from "@/components/SpeakButton";
 import { useQuranProgress } from "@/hooks/useQuranProgress";
 
-type HubTab = "learn" | "highlights";
-
 export default function QuranPage() {
-  const [tab, setTab] = useState<HubTab>("learn");
+  const [showVerses, setShowVerses] = useState(false);
   const [view, setView] = useState<"browse" | "study">("browse");
   const [filterTopic, setFilterTopic] = useState("All");
-  const { counts, path } = useQuranProgress();
+  const { counts, path, continueTarget } = useQuranProgress();
 
   const filtered =
     filterTopic === "All" ? quranVerses : quranVerses.filter((v) => v.topic === filterTopic);
@@ -39,35 +37,7 @@ export default function QuranPage() {
         </p>
       </div>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
-        {(
-          [
-            { key: "learn" as const, label: "Learn Surahs" },
-            { key: "highlights" as const, label: "Highlights" },
-          ] as const
-        ).map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setTab(t.key)}
-            style={{
-              padding: "10px 18px",
-              borderRadius: 12,
-              fontWeight: 800,
-              fontSize: 15,
-              cursor: "pointer",
-              background: tab === t.key ? "var(--navy)" : "white",
-              color: tab === t.key ? "white" : "var(--navy)",
-              border: "2px solid var(--navy)",
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {tab === "learn" ? (
-        <>
+      <>
           <div
             style={{
               borderRadius: 18,
@@ -89,7 +59,7 @@ export default function QuranPage() {
               <span>Due {counts.due}</span>
             </div>
             <Link
-              href="/quran/learn"
+              href={continueTarget.href}
               style={{
                 display: "inline-block",
                 marginTop: 16,
@@ -101,7 +71,9 @@ export default function QuranPage() {
                 textDecoration: "none",
               }}
             >
-              Continue learning →
+              {continueTarget.kind === "due"
+                ? `Review ${continueTarget.surah.nameEn} →`
+                : `Continue ${continueTarget.surah.nameEn} →`}
             </Link>
           </div>
 
@@ -163,10 +135,28 @@ export default function QuranPage() {
               </Link>
             ))}
           </div>
-        </>
-      ) : (
+
+          <button
+            type="button"
+            onClick={() => setShowVerses((open) => !open)}
+            style={{
+              marginTop: 8,
+              padding: "10px 16px",
+              borderRadius: 10,
+              border: "2px solid #ddd",
+              background: "white",
+              color: "var(--navy)",
+              fontWeight: 800,
+              cursor: "pointer",
+              fontSize: 14,
+            }}
+          >
+            {showVerses ? "Hide verses to know" : "Verses to know"}
+          </button>
+
+          {showVerses && (
         <>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, margin: "20px 0 12px" }}>
             <p style={{ color: "#666", fontSize: 15, margin: 0 }}>
               Key ayahs for meaning and reflection (not full surahs).
             </p>
@@ -293,7 +283,8 @@ export default function QuranPage() {
             </div>
           )}
         </>
-      )}
+          )}
+      </>
     </div>
   );
 }
