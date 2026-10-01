@@ -10,8 +10,9 @@ function LessonContent() {
   const params = useSearchParams();
   const id = params.get("id");
   const lesson = arabic101Lessons.find((l) => l.id === id);
-  const [tab, setTab] = useState<"concepts" | "rules" | "practice">("concepts");
+  const [tab, setTab] = useState<"concepts" | "rules" | "practice" | "drill">("concepts");
   const [drillRun, setDrillRun] = useState(0);
+  const studying = tab === "practice" || tab === "drill";
 
   if (!lesson) {
     return (
@@ -31,28 +32,36 @@ function LessonContent() {
       <div className="px-4 pt-4 pb-2">
         <Link href="/arabic-101" className="text-blue-400 text-sm hover:text-blue-300">← Arabic 101</Link>
       </div>
-      <div
-        className="px-4 py-6 text-center"
-        style={{ background: `linear-gradient(135deg, ${lesson.color}33, #0D1117)` }}
-      >
-        <div className="text-4xl mb-2">{lesson.emoji}</div>
-        <VoicedText text={lesson.title} className="mb-1 text-2xl font-bold text-white" />
-        <VoicedText text={lesson.description} className="mx-auto max-w-xs text-sm text-gray-400" />
-      </div>
+      {!studying && (
+        <div
+          className="px-4 py-6 text-center"
+          style={{ background: `linear-gradient(135deg, ${lesson.color}33, #0D1117)` }}
+        >
+          <div className="text-4xl mb-2">{lesson.emoji}</div>
+          <VoicedText text={lesson.title} className="mb-1 text-2xl font-bold text-white" />
+          <VoicedText text={lesson.description} className="mx-auto max-w-xs text-sm text-gray-400" />
+        </div>
+      )}
 
-      {/* Tabs */}
-      <div className="flex border-b border-gray-800 px-4">
-        {(["concepts", "rules", "practice"] as const).map((t) => (
+      <div className="flex overflow-x-auto border-b border-gray-800 px-4">
+        {(
+          [
+            ["concepts", "📚 Concepts"],
+            ["rules", "📋 Rules"],
+            ["practice", "🎯 Practice"],
+            ["drill", "✏️ Drill"],
+          ] as const
+        ).map(([id, label]) => (
           <button
-            key={t}
+            key={id}
             type="button"
-            onClick={() => setTab(t)}
-            className={`flex-1 py-3 text-sm font-semibold capitalize transition-colors ${
-              tab === t ? "text-white border-b-2" : "text-gray-500 hover:text-gray-300"
+            onClick={() => setTab(id)}
+            className={`shrink-0 flex-1 py-3 text-sm font-semibold transition-colors ${
+              tab === id ? "text-white border-b-2" : "text-gray-500 hover:text-gray-300"
             }`}
-            style={{ borderColor: tab === t ? lesson.color : "transparent" }}
+            style={{ borderColor: tab === id ? lesson.color : "transparent" }}
           >
-            {t === "concepts" ? "📚 Concepts" : t === "rules" ? "📋 Rules" : "🎯 Practice"}
+            {label}
           </button>
         ))}
       </div>
@@ -87,17 +96,10 @@ function LessonContent() {
           </div>
         )}
 
-        {tab === "practice" && (
-          <div className="space-y-10">
-            <LessonStudy lesson={lesson} />
-            <div>
-              <h2 className="mb-1 text-lg font-bold text-white">Drill</h2>
-              <p className="mb-4 text-sm text-gray-400">
-                Answer every question. A miss comes back once. The score is your first try.
-              </p>
-              <DrillSession key={`${lesson.id}-${drillRun}`} lesson={lesson} onRestart={() => setDrillRun((n) => n + 1)} />
-            </div>
-          </div>
+        {tab === "practice" && <LessonStudy lesson={lesson} />}
+
+        {tab === "drill" && (
+          <DrillSession key={`${lesson.id}-${drillRun}`} lesson={lesson} onRestart={() => setDrillRun((n) => n + 1)} />
         )}
       </div>
     </div>
@@ -109,14 +111,8 @@ function LessonStudy({ lesson }: { lesson: Arabic101Lesson }) {
   if (cards.length === 0) return null;
 
   return (
-    <div>
-      <h2 className="mb-1 text-lg font-bold text-white">Flashcards, quiz, and match</h2>
-      <p className="mb-4 text-sm text-gray-400">
-        Flip the Arabic, then quiz and match it before the drill.
-      </p>
-      <div className="rounded-2xl bg-[#FEFCF6] p-4 text-[var(--navy)]">
-        <StudySet cards={cards} title={lesson.title} />
-      </div>
+    <div className="rounded-2xl bg-[#FEFCF6] p-4 text-(--navy)">
+      <StudySet cards={cards} title={lesson.title} layout="focus" />
     </div>
   );
 }

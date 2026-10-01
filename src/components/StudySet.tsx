@@ -17,7 +17,7 @@ type Mode = "flashcard" | "learn" | "match";
 function shuffle<T>(arr: T[]): T[] { return [...arr].sort(() => Math.random() - 0.5); }
 
 // ─── Flashcard mode ──────────────────────────────────────────────────────────
-function FlashcardMode({ cards }: { cards: StudyCard[] }) {
+function FlashcardMode({ cards, layout = "default" }: { cards: StudyCard[]; layout?: "default" | "focus" }) {
   const [idx, setIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const card = cards[idx];
@@ -38,7 +38,7 @@ function FlashcardMode({ cards }: { cards: StudyCard[] }) {
       {/* card */}
       <div
         className="w-full cursor-pointer"
-        style={{ maxWidth: 560, height: "min(640px, 120vw)", perspective: "1000px" }}
+        style={{ maxWidth: 560, height: layout === "focus" ? "min(420px, 58vh)" : "min(640px, 120vw)", perspective: "1000px" }}
         onClick={(e) => {
           if (e.target instanceof Element && e.target.closest("button")) return;
           setFlipped(f => !f);
@@ -255,7 +255,7 @@ function MatchMode({ cards }: { cards: StudyCard[] }) {
 }
 
 // ─── Main StudySet component ─────────────────────────────────────────────────
-export default function StudySet({ cards, title }: { cards: StudyCard[]; title: string }) {
+export default function StudySet({ cards, title, layout = "default" }: { cards: StudyCard[]; title: string; layout?: "default" | "focus" }) {
   const [mode, setMode] = useState<Mode>("flashcard");
   const modes: { key: Mode; label: string; icon: string }[] = [
     { key: "flashcard", label: "Flashcard", icon: "🃏" },
@@ -280,7 +280,7 @@ export default function StudySet({ cards, title }: { cards: StudyCard[]; title: 
         <span style={{ marginLeft: "auto", fontSize: 13, color: "#888", alignSelf: "center" }}>{cards.length} cards</span>
       </div>
 
-      {mode==="flashcard" && <FlashcardMode cards={cards} />}
+      {mode==="flashcard" && <FlashcardMode cards={cards} layout={layout} />}
       {mode==="learn"     && <LearnMode cards={cards} />}
       {mode==="match"     && <MatchMode cards={cards} />}
     </div>
