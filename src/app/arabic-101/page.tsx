@@ -13,7 +13,7 @@ export default function Arabic101Hub() {
         <h1 className="text-3xl font-bold mb-2">Arabic 101</h1>
         <p className="text-blue-200 text-sm font-medium uppercase tracking-widest mb-1">Miftaah Institute</p>
         <p className="text-gray-300 text-base max-w-md mx-auto">
-          Nahw (Arabic Grammar) — from the foundations up. Study concepts, rules, and drill with answer keys.
+          Nahw (Arabic Grammar) — from the foundations up. Each lesson is flashcards, a quiz, and match, then the drill.
         </p>
         <div className="mt-4 flex justify-center gap-4 text-sm text-blue-200">
           <span>📚 {arabic101Lessons.length} Lessons</span>
@@ -50,9 +50,10 @@ export default function Arabic101Hub() {
                   </div>
                   <h2 className="mb-1 text-lg font-bold leading-tight text-white">{lesson.title}</h2>
                   <p className="mb-3 text-sm text-gray-400">{lesson.description}</p>
-                  <div className="flex gap-3 text-xs text-gray-500">
-                    <span>📋 {lesson.concepts.length} concepts</span>
-                    <span>📌 {lesson.rules.length} rules</span>
+                  <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+                    <span>🃏 Flashcards</span>
+                    <span>🎯 Quiz</span>
+                    <span>🔗 Match</span>
                     <span>✏️ {lesson.drills.length} drills</span>
                   </div>
                 </div>

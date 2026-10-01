@@ -16,6 +16,29 @@ export interface Arabic101Drill {
   explanation?: string;
 }
 
+/** Correct answer plus up to three other answers from the same lesson. */
+export function drillChoices(answer: string, pool: string[]): string[] {
+  const wrong = [...new Set(pool.filter((item) => item !== answer))];
+  return shuffle([answer, ...shuffle(wrong).slice(0, 3)]);
+}
+
+export function shuffledIndexes(length: number): number[] {
+  return shuffle([...Array(length).keys()]);
+}
+
+function shuffle<T>(items: T[]): T[] {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const current = copy[i];
+    const swap = copy[j];
+    if (current === undefined || swap === undefined) continue;
+    copy[i] = swap;
+    copy[j] = current;
+  }
+  return copy;
+}
+
 export interface Arabic101Lesson {
   id: string;
   title: string;
@@ -25,6 +48,58 @@ export interface Arabic101Lesson {
   concepts: Arabic101Item[];
   rules: string[];
   drills: Arabic101Drill[];
+}
+
+export interface Arabic101StudyCard {
+  id: number;
+  arabic: string;
+  transliteration: string;
+  english: string;
+  subtitle?: string;
+  badge?: string;
+  note?: string;
+}
+
+const ARABIC_LETTER = /[\u0621-\u064A\u0671-\u06D3]/;
+
+function arabicText(value: string | undefined): string {
+  if (!value || !ARABIC_LETTER.test(value)) return "";
+  return value;
+}
+
+/** Words and phrases to flip, quiz, and match. English-only prompts stay in the drill. */
+export function lessonStudyCards(lesson: Arabic101Lesson): Arabic101StudyCard[] {
+  const cards: Arabic101StudyCard[] = [];
+  let id = 1;
+
+  for (const item of lesson.concepts) {
+    const arabic = arabicText(item.arabic) || arabicText(item.term);
+    if (!arabic) continue;
+    cards.push({
+      id: id++,
+      arabic,
+      transliteration: item.transliteration ?? "",
+      english: item.english,
+      badge: "Concept",
+      note: item.note,
+    });
+  }
+
+  for (const drill of lesson.drills) {
+    const arabic = arabicText(drill.arabic);
+    if (!arabic) continue;
+    cards.push({
+      id: id++,
+      arabic,
+      transliteration: "",
+      english: drill.answer,
+      subtitle: drill.question,
+      badge: "Drill",
+      note: drill.explanation,
+    });
+  }
+
+  return cards;
 }
 
 export const arabic101Lessons: Arabic101Lesson[] = [
