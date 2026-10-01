@@ -168,6 +168,33 @@ export function getDueAyahs(
   });
 }
 
+export type ContinueTarget = {
+  surah: QuranSurah;
+  href: string;
+  kind: "due" | "continue" | "done";
+  due: number;
+  nextAyah: number;
+  percent: number;
+};
+
+/** Next place to study: due lines first, otherwise the first unfinished surah. */
+export function getContinueTarget(progress: AyahProgressMap, now = Date.now()): ContinueTarget {
+  const ordered = [...quranSurahs].sort((a, b) => a.order - b.order);
+  const dueSurah = ordered.find((surah) => getSurahProgress(surah, progress, now).due > 0);
+  const unfinished = ordered.find((surah) => getSurahProgress(surah, progress, now).percent < 100);
+  const surah = dueSurah ?? unfinished ?? ordered[0]!;
+  const summary = getSurahProgress(surah, progress, now);
+  const kind: ContinueTarget["kind"] = dueSurah ? "due" : unfinished ? "continue" : "done";
+  return {
+    surah,
+    href: `/quran/learn/${surah.slug}`,
+    kind,
+    due: summary.due,
+    nextAyah: summary.nextAyah,
+    percent: summary.percent,
+  };
+}
+
 export function countPathProgress(progress: AyahProgressMap, now = Date.now()) {
   const total = allPathAyahs().length;
   let known = 0;

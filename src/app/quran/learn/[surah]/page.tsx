@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import SpeakButton from "@/components/SpeakButton";
 import PronounceButton from "@/components/PronounceButton";
 import { useQuranProgress } from "@/hooks/useQuranProgress";
-import { ayahKey, getSurahBySlug } from "@/lib/quranSurahs";
+import { ayahKey, getSurahBySlug, quranSurahs } from "@/lib/quranSurahs";
 
 type Phase = "study" | "recall" | "chain" | "done";
 
@@ -23,12 +23,14 @@ export default function QuranSurahLearnPage() {
   const [phase, setPhase] = useState<Phase>("study");
   const [reviewMode, setReviewMode] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [peeked, setPeeked] = useState<number[]>([]);
   const chainTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setHydrated(false);
     setPhase("study");
     setReviewMode(false);
+    setPeeked([]);
     if (chainTimerRef.current) {
       clearTimeout(chainTimerRef.current);
       chainTimerRef.current = null;
@@ -58,6 +60,9 @@ export default function QuranSurahLearnPage() {
     );
   }
 
+  const nextSurah = [...quranSurahs]
+    .sort((a, b) => a.order - b.order)
+    .find((item) => item.order > surah.order);
   const ayah = surah.ayahs[Math.min(idx, surah.ayahs.length - 1)]!;
   const entry = progress[ayahKey(surah.number, ayah.ayah)];
   const chainAyahs = surah.ayahs.slice(0, idx + 1);
@@ -66,6 +71,12 @@ export default function QuranSurahLearnPage() {
   const goStudy = (nextIdx: number) => {
     setIdx(nextIdx);
     setPhase("study");
+    setPeeked([]);
+  };
+
+  const startChain = () => {
+    setPeeked([]);
+    setPhase("chain");
   };
 
   const startDueReview = () => {
@@ -153,7 +164,7 @@ export default function QuranSurahLearnPage() {
           </p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
             <Link
-              href="/quran/learn"
+              href={nextSurah ? `/quran/learn/${nextSurah.slug}` : "/quran/learn"}
               style={{
                 padding: "12px 20px",
                 borderRadius: 12,
@@ -163,7 +174,7 @@ export default function QuranSurahLearnPage() {
                 textDecoration: "none",
               }}
             >
-              Next surah →
+              {nextSurah ? `Next: ${nextSurah.nameEn} →` : "Back to path"}
             </Link>
             <button
               type="button"
@@ -196,10 +207,12 @@ export default function QuranSurahLearnPage() {
             Chain check — recite ayah 1 → {ayah.ayah}
           </div>
           <p style={{ color: "#555", marginBottom: 16, fontSize: 15, lineHeight: 1.5 }}>
-            Cover the lines if you can. Tap Speak on any line you need, then mark Done.
+            Recite from memory. Peek only if you need a line, then mark Done.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
-            {chainAyahs.map((a) => (
+            {chainAyahs.map((a) => {
+              const open = peeked.includes(a.ayah);
+              return (
               <div
                 key={a.ayah}
                 style={{
@@ -212,19 +225,40 @@ export default function QuranSurahLearnPage() {
                 <div style={{ fontSize: 12, fontWeight: 800, color: "#888", marginBottom: 6 }}>
                   {surah.nameEn} {a.ayah}
                 </div>
-                <div
-                  className="arabic arabic-read"
-                  style={{
-                    color: "var(--navy)",
-                    textAlign: "right",
-                    marginBottom: 8,
-                  }}
-                >
-                  {a.arabic}
-                </div>
-                <SpeakButton text={a.arabic} size="md" />
+                {open ? (
+                  <>
+                    <div
+                      className="arabic arabic-read"
+                      style={{
+                        color: "var(--navy)",
+                        textAlign: "right",
+                        marginBottom: 8,
+                      }}
+                    >
+                      {a.arabic}
+                    </div>
+                    <SpeakButton text={a.arabic} size="md" />
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setPeeked((lines) => [...lines, a.ayah])}
+                    style={{
+                      padding: "8px 14px",
+                      borderRadius: 10,
+                      border: "2px solid var(--navy)",
+                      background: "white",
+                      color: "var(--navy)",
+                      fontWeight: 800,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Peek
+                  </button>
+                )}
               </div>
-            ))}
+              );
+            })}
           </div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button
@@ -347,7 +381,7 @@ export default function QuranSurahLearnPage() {
                   correct(surah.number, ayah.ayah);
                   if (chainTimerRef.current) clearTimeout(chainTimerRef.current);
                   // Keep Correct banner visible briefly before chain check
-                  chainTimerRef.current = setTimeout(() => setPhase("chain"), 1800);
+                  chainTimerRef.current = setTimeout(() => startChain(), 1800);
                 } else {
                   wrong(surah.number, ayah.ayah);
                 }
@@ -398,7 +432,7 @@ export default function QuranSurahLearnPage() {
                 type="button"
                 onClick={() => {
                   correct(surah.number, ayah.ayah);
-                  setPhase("chain");
+                  startChain();
                 }}
                 style={{
                   padding: "14px 24px",
