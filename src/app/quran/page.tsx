@@ -37,6 +37,29 @@ export default function QuranPage() {
         </p>
       </div>
 
+      {/* Browse All Surahs CTA */}
+      <Link
+        href="/quran/browse"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          background: "linear-gradient(135deg, #1a3a2a, #0f2218)",
+          borderRadius: 16,
+          padding: "18px 22px",
+          marginBottom: 20,
+          textDecoration: "none",
+          border: "1.5px solid #22c55e44",
+        }}
+      >
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#22c55e", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>New</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "white", marginBottom: 2 }}>📖 Browse All 114 Surahs</div>
+          <div style={{ fontSize: 13, color: "#9ca3af" }}>Big Arabic · Transliteration · Sahih Translation</div>
+        </div>
+        <div style={{ color: "#22c55e", fontSize: 24 }}>›</div>
+      </Link>
+
       <>
           <div
             style={{

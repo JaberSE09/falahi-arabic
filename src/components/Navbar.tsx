@@ -41,6 +41,7 @@ const sections: NavSection[] = [
     accent: "#10B981",
     links: [
       { href: "/quran", label: "Quran" },
+      { href: "/quran/browse", label: "All Surahs" },
       { href: "/dua", label: "Duas" },
       { href: "/hadith", label: "Hadith" },
     ],
