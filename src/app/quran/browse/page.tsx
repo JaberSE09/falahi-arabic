@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
-const SURAHS = [
+export const SURAHS = [
   { n: 1, ar: "الفاتحة", en: "Al-Fatihah", tr: "The Opening", ayahs: 7 },
   { n: 2, ar: "البقرة", en: "Al-Baqarah", tr: "The Cow", ayahs: 286 },
   { n: 3, ar: "آل عمران", en: "Ali 'Imran", tr: "Family of Imran", ayahs: 200 },
@@ -119,35 +119,8 @@ const SURAHS = [
   { n: 114, ar: "الناس", en: "An-Nas", tr: "The Mankind", ayahs: 6 },
 ];
 
-const JUZ_STARTS: Record<number, number> = {
-  1:1,2:2,3:2,4:3,5:4,6:4,7:5,8:6,9:7,10:8,11:9,12:10,13:11,14:12,15:15,
-  16:18,17:21,18:23,19:25,20:27,21:29,22:33,23:36,24:39,25:41,26:46,
-  27:51,28:58,29:67,30:78,
-};
-
-function getJuz(n: number): number {
-  let juz = 1;
-  for (const [j, start] of Object.entries(JUZ_STARTS)) {
-    if (n >= start) juz = parseInt(j);
-    else break;
-  }
-  return juz;
-}
-
-interface Ayah {
-  number: number;
-  text: string;
-  transliteration: string;
-  translation: string;
-}
-
 export default function QuranBrowsePage() {
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<number | null>(null);
-  const [ayahs, setAyahs] = useState<Ayah[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [fontSize, setFontSize] = useState(32);
 
   const filtered = SURAHS.filter(
     (s) =>
@@ -157,163 +130,74 @@ export default function QuranBrowsePage() {
       String(s.n).includes(search)
   );
 
-  async function loadSurah(n: number) {
-    if (selected === n) { setSelected(null); setAyahs([]); return; }
-    setSelected(n);
-    setAyahs([]);
-    setLoading(true);
-    setError("");
-    try {
-      // Fetch Arabic + English + transliteration in parallel
-      const [arRes, enRes, trRes] = await Promise.all([
-        fetch(`https://api.alquran.cloud/v1/surah/${n}/ar.alafasy`),
-        fetch(`https://api.alquran.cloud/v1/surah/${n}/en.sahih`),
-        fetch(`https://api.alquran.cloud/v1/surah/${n}/en.transliteration`),
-      ]);
-      const [arData, enData, trData] = await Promise.all([arRes.json(), enRes.json(), trRes.json()]);
-      const arAyahs = arData.data?.ayahs ?? [];
-      const enAyahs = enData.data?.ayahs ?? [];
-      const trAyahs = trData.data?.ayahs ?? [];
-      const merged: Ayah[] = arAyahs.map((a: {numberInSurah: number; text: string}, i: number) => ({
-        number: a.numberInSurah,
-        text: a.text,
-        transliteration: trAyahs[i]?.text ?? "",
-        translation: enAyahs[i]?.text ?? "",
-      }));
-      setAyahs(merged);
-    } catch {
-      setError("Failed to load — check connection");
-    }
-    setLoading(false);
-  }
-
   return (
-    <div className="min-h-screen bg-[#0D1117] text-white">
+    <div style={{ minHeight: "100vh", background: "#0D1117", color: "white" }}>
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#1a3a2a] to-[#0D1117] px-4 py-10 text-center">
-        <div className="text-5xl mb-3">📖</div>
-        <h1 className="text-3xl font-bold mb-1">Al-Quran</h1>
-        <p className="text-green-300 text-sm font-medium uppercase tracking-widest mb-1">كِتَابٌ أَنزَلْنَاهُ إِلَيْكَ مُبَارَكٌ</p>
-        <p className="text-gray-400 text-sm">All 114 Surahs · Arabic · Transliteration · Translation</p>
+      <div style={{ background: "linear-gradient(135deg, #1a3a2a, #0D1117)", padding: "40px 20px 28px", textAlign: "center" }}>
+        <div style={{ fontSize: 48, marginBottom: 10 }}>📖</div>
+        <h1 style={{ fontSize: 28, fontWeight: 800, margin: "0 0 4px", color: "white" }}>Al-Quran</h1>
+        <p style={{ color: "#86efac", fontSize: 13, margin: "0 0 6px", letterSpacing: "0.05em" }}>كِتَابٌ أَنزَلْنَاهُ إِلَيْكَ مُبَارَكٌ</p>
+        <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>114 Surahs · Tap any surah to read</p>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 pb-16">
-        {/* Back */}
-        <div className="pt-4 pb-2">
-          <Link href="/quran" className="text-green-400 text-sm hover:text-green-300">← Back to Quran</Link>
-        </div>
-
-        {/* Font size control */}
-        <div className="flex items-center gap-3 mb-4 bg-gray-900 rounded-xl p-3 border border-gray-800">
-          <span className="text-gray-400 text-sm">Arabic size:</span>
-          <input type="range" min={20} max={56} value={fontSize}
-            onChange={e => setFontSize(Number(e.target.value))}
-            className="flex-1 accent-green-500" />
-          <span className="text-green-400 font-bold text-sm w-8">{fontSize}px</span>
+      <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 16px 80px" }}>
+        {/* Back link */}
+        <div style={{ padding: "14px 0 10px" }}>
+          <a href="/quran" style={{ color: "#4ade80", fontSize: 14, textDecoration: "none" }}>← Back to Quran</a>
         </div>
 
         {/* Search */}
         <input
           type="text"
-          placeholder="Search surah name or number..."
+          placeholder="Search by name, number, or meaning..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full mb-4 px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 text-sm"
+          style={{
+            width: "100%", boxSizing: "border-box", padding: "12px 16px",
+            borderRadius: 14, background: "#111827", border: "1.5px solid #1f2937",
+            color: "white", fontSize: 15, marginBottom: 8, outline: "none",
+          }}
         />
+        <p style={{ color: "#4b5563", fontSize: 12, margin: "0 0 16px" }}>{filtered.length} surahs</p>
 
-        <p className="text-gray-500 text-xs mb-4">{filtered.length} of 114 surahs</p>
-
-        {/* Surah list */}
-        <div className="space-y-2">
+        {/* Surah cards */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {filtered.map((s) => (
-            <div key={s.n}>
-              {/* Surah card */}
-              <button
-                onClick={() => loadSurah(s.n)}
-                className="w-full text-left rounded-2xl p-4 transition-all active:scale-[0.98]"
-                style={{
-                  background: selected === s.n ? "#1a3a2a" : "#111827",
-                  border: `1.5px solid ${selected === s.n ? "#22c55e55" : "#1f2937"}`,
-                }}
-              >
-                <div className="flex items-center gap-4">
-                  {/* Number badge */}
-                  <div className="w-10 h-10 rounded-full bg-green-900 flex items-center justify-center flex-shrink-0 border border-green-700">
-                    <span className="text-green-400 font-bold text-sm">{s.n}</span>
-                  </div>
-                  {/* Names */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-2 flex-wrap">
-                      <span className="text-white font-bold text-base">{s.en}</span>
-                      <span className="text-gray-400 text-xs">{s.tr}</span>
-                    </div>
-                    <div className="text-gray-500 text-xs mt-0.5">{s.ayahs} ayahs · Juz {getJuz(s.n)}</div>
-                  </div>
-                  {/* Arabic name */}
-                  <div className="text-right flex-shrink-0">
-                    <div className="text-green-400 font-bold text-xl" dir="rtl" style={{ fontFamily: "serif" }}>{s.ar}</div>
-                  </div>
-                  {/* Chevron */}
-                  <div className={`text-gray-500 transition-transform ${selected === s.n ? "rotate-180" : ""}`}>▼</div>
-                </div>
-              </button>
+            <a
+              key={s.n}
+              href={`/quran/browse/${s.n}`}
+              style={{
+                display: "flex", alignItems: "center", gap: 14,
+                background: "#111827", borderRadius: 18,
+                padding: "16px 18px", textDecoration: "none",
+                border: "1.5px solid #1f2937", color: "inherit",
+                transition: "border-color 0.15s",
+              }}
+            >
+              {/* Number badge */}
+              <div style={{
+                width: 42, height: 42, borderRadius: "50%", flexShrink: 0,
+                background: "#14532d", border: "1.5px solid #166534",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <span style={{ color: "#4ade80", fontWeight: 700, fontSize: 13 }}>{s.n}</span>
+              </div>
 
-              {/* Ayahs panel */}
-              {selected === s.n && (
-                <div className="mt-1 rounded-2xl bg-gray-950 border border-gray-800 overflow-hidden">
-                  {loading && (
-                    <div className="py-12 text-center text-gray-400 text-sm">
-                      <div className="text-3xl mb-3 animate-pulse">📖</div>
-                      Loading {s.en}...
-                    </div>
-                  )}
-                  {error && (
-                    <div className="py-8 text-center text-red-400 text-sm">{error}</div>
-                  )}
-                  {!loading && !error && ayahs.length > 0 && (
-                    <div>
-                      {/* Bismillah (except At-Tawbah #9 and Al-Fatihah #1 which starts with it) */}
-                      {s.n !== 9 && s.n !== 1 && (
-                        <div className="px-5 pt-6 pb-4 text-center border-b border-gray-800">
-                          <p className="text-green-300 text-2xl font-bold" dir="rtl" style={{ fontFamily: "serif", fontSize: `${Math.min(fontSize, 32)}px` }}>
-                            بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-                          </p>
-                          <p className="text-gray-400 text-xs mt-1 italic">Bismi llāhi r-raḥmāni r-raḥīm</p>
-                          <p className="text-gray-500 text-xs">In the name of Allah, the Entirely Merciful, the Especially Merciful.</p>
-                        </div>
-                      )}
-                      {ayahs.map((a) => (
-                        <div key={a.number} className="px-5 py-5 border-b border-gray-800 last:border-0">
-                          {/* Ayah number */}
-                          <div className="flex items-center gap-2 mb-3">
-                            <div className="w-7 h-7 rounded-full bg-green-900 flex items-center justify-center border border-green-700 flex-shrink-0">
-                              <span className="text-green-400 text-xs font-bold">{a.number}</span>
-                            </div>
-                            <div className="h-px flex-1 bg-gray-800" />
-                          </div>
-                          {/* Arabic text — BIG */}
-                          <p
-                            className="text-white text-right leading-loose mb-4 font-normal"
-                            dir="rtl"
-                            style={{ fontSize: `${fontSize}px`, fontFamily: "serif", lineHeight: 1.8 }}
-                          >
-                            {a.text}
-                          </p>
-                          {/* Transliteration */}
-                          <p className="text-green-300 text-sm italic mb-2 leading-relaxed">
-                            {a.transliteration}
-                          </p>
-                          {/* Translation */}
-                          <p className="text-gray-300 text-sm leading-relaxed">
-                            {a.translation}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+              {/* Name + meta */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, color: "white", fontSize: 16, marginBottom: 2 }}>{s.en}</div>
+                <div style={{ color: "#9ca3af", fontSize: 12 }}>{s.tr} · {s.ayahs} ayahs</div>
+              </div>
+
+              {/* Arabic name */}
+              <div dir="rtl" style={{
+                fontFamily: "serif", fontSize: 22, color: "#4ade80",
+                fontWeight: 600, flexShrink: 0,
+              }}>{s.ar}</div>
+
+              {/* Arrow */}
+              <div style={{ color: "#374151", fontSize: 18, flexShrink: 0 }}>›</div>
+            </a>
           ))}
         </div>
       </div>
