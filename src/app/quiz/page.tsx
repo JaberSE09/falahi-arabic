@@ -7,6 +7,32 @@ import ArabicForms from "@/components/ArabicForms";
 import { useProgress } from "@/hooks/useProgress";
 import { pickGapWords, shuffle, getProgress, getMissedWords, getDueWords } from "@/lib/progress";
 
+function AnswerMark({ kind }: { kind: "correct" | "incorrect" }) {
+  const correct = kind === "correct";
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        width: 28,
+        height: 28,
+        flexShrink: 0,
+        borderRadius: 6,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 18,
+        fontWeight: 900,
+        lineHeight: 1,
+        background: "white",
+        color: correct ? "var(--green)" : "#C0392B",
+        boxShadow: "0 0 0 2px white",
+      }}
+    >
+      {correct ? "✓" : "✕"}
+    </span>
+  );
+}
+
 function getOptions(correct: (typeof vocabulary)[0], all: typeof vocabulary) {
   const pool = all.filter((w) => w.id !== correct.id);
   const sameCat = pool.filter((w) => w.category === correct.category);
@@ -281,25 +307,30 @@ function QuizInner() {
         {options.map((opt) => {
           const isCorrect = opt.id === word.id;
           const isSel = selected === opt.id;
+          const answered = selected !== null;
+          const showCorrect = answered && isCorrect;
+          const showWrong = answered && isSel && !isCorrect;
           let bg = "white";
           let color = "var(--navy)";
           let border = "3px solid #ddd";
-          if (selected !== null) {
-            if (isCorrect) {
-              bg = "var(--green)";
-              color = "white";
-              border = "3px solid var(--green)";
-            } else if (isSel) {
-              bg = "#C0392B";
-              color = "white";
-              border = "3px solid #C0392B";
-            }
+          if (showCorrect) {
+            bg = "var(--green)";
+            color = "white";
+            border = "3px solid var(--green)";
+          } else if (showWrong) {
+            bg = "#C0392B";
+            color = "white";
+            border = "3px solid #C0392B";
           }
+          const label = mode === "arToEn" ? opt.english : opt.arabic;
           return (
             <button
               key={opt.id}
               type="button"
               onClick={() => handleAnswer(opt)}
+              aria-label={
+                showCorrect ? `Correct: ${label}` : showWrong ? `Incorrect: ${label}` : label
+              }
               style={{
                 padding: "20px 12px",
                 borderRadius: 16,
@@ -308,17 +339,23 @@ function QuizInner() {
                 background: bg,
                 color,
                 border,
-                cursor: selected !== null ? "default" : "pointer",
+                cursor: answered ? "default" : "pointer",
                 transition: "all 0.2s",
                 textAlign: "center",
                 lineHeight: 1.4,
               }}
             >
-              {mode === "arToEn" ? (
-                opt.english
-              ) : (
-                <ArabicForms word={opt} tone="dark" scale="inline" compact />
-              )}
+              <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                {showCorrect && <AnswerMark kind="correct" />}
+                {showWrong && <AnswerMark kind="incorrect" />}
+                <span>
+                  {mode === "arToEn" ? (
+                    opt.english
+                  ) : (
+                    <ArabicForms word={opt} tone={showCorrect || showWrong ? "white" : "dark"} scale="inline" compact />
+                  )}
+                </span>
+              </span>
             </button>
           );
         })}
