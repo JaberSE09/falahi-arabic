@@ -1,327 +1,454 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import { vocabulary, categories, Word } from "@/lib/vocabulary";
+
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { vocabulary, categories, type Word } from "@/lib/vocabulary";
 import ArabicForms, { ExampleForms } from "@/components/ArabicForms";
 import { useProgress } from "@/hooks/useProgress";
-import { getWordStatus } from "@/lib/progress";
+import {
+  buildStudyQueue,
+  getProgress,
+  nextScheduledReview,
+  waitingWords,
+} from "@/lib/progress";
 
-type FilterMode = "all" | "unlearned" | "learned";
+type Mode = "study" | "browse";
 
-// ─── FlashCard ────────────────────────────────────────────────────────────────
-function FlashCard({
-  word, index, total, isLearned,
-  onMarkLearned, onMarkUnlearned, onNext, onPrev,
+function wordsIn(category: string): Word[] {
+  return category === "All" ? vocabulary : vocabulary.filter((word) => word.category === category);
+}
+
+function formatWait(at: number, now: number): string {
+  const minutes = Math.max(1, Math.round((at - now) / 60000));
+  if (minutes < 60) return `in ${minutes} minute${minutes === 1 ? "" : "s"}`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 36) return `in ${hours} hour${hours === 1 ? "" : "s"}`;
+  const days = Math.max(1, Math.round(hours / 24));
+  return `in ${days} day${days === 1 ? "" : "s"}`;
+}
+
+/** Put the missed card back after three other cards, without rebuilding from storage. */
+function requeueAgain(queue: Word[]): Word[] {
+  const [current, ...rest] = queue;
+  if (!current) return queue;
+  const insertAt = Math.min(3, rest.length);
+  const next = [...rest];
+  next.splice(insertAt, 0, current);
+  return next;
+}
+
+function FlipCard({
+  word,
+  flipped,
+  onFlip,
 }: {
-  word: Word; index: number; total: number; isLearned: boolean;
-  onMarkLearned: () => void; onMarkUnlearned: () => void;
-  onNext: () => void; onPrev: () => void;
+  word: Word;
+  flipped: boolean;
+  onFlip: () => void;
 }) {
-  const [flipped, setFlipped] = useState(false);
-
-  const next = () => { setFlipped(false); setTimeout(onNext, 150); };
-  const prev = () => { setFlipped(false); setTimeout(onPrev, 150); };
-
-  const handleMark = () => {
-    if (isLearned) {
-      onMarkUnlearned();
-    } else {
-      onMarkLearned();
-      setTimeout(() => { setFlipped(false); setTimeout(onNext, 150); }, 350);
-    }
-  };
-
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-
-      {/* Progress bar */}
-      <div style={{ width: "100%", display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ flex: 1, height: 10, borderRadius: 99, background: "#ddd", overflow: "hidden" }}>
-          <div style={{
-            height: 10, borderRadius: 99,
-            background: isLearned ? "#4ade80" : "var(--gold)",
-            width: `${((index + 1) / total) * 100}%`,
-            transition: "width 0.3s",
-          }} />
-        </div>
-        <span style={{ fontSize: 17, fontWeight: 700, color: "var(--navy)", minWidth: 56 }}>
-          {index + 1}/{total}
-        </span>
-      </div>
-
-      {/* Learned badge */}
-      {isLearned && (
-        <div style={{
-          display: "flex", alignItems: "center", gap: 6,
-          background: "rgba(74,222,128,0.12)", border: "2px solid #4ade80",
-          borderRadius: 99, padding: "5px 16px", fontSize: 15, fontWeight: 700, color: "#16a34a",
-        }}>
-          ✅ You know this word!
-        </div>
-      )}
-
-      {/* Flip card — PR #1 fix: ignore clicks on SpeakButton */}
+    <div
+      onClick={(event) => {
+        if (event.target instanceof Element && event.target.closest("button")) return;
+        onFlip();
+      }}
+      style={{
+        width: "100%",
+        maxWidth: 520,
+        height: word.arabicF ? "min(820px, 170vw)" : "min(520px, 110vw)",
+        perspective: 1000,
+        cursor: "pointer",
+      }}
+    >
       <div
-        onClick={(e) => {
-          if (e.target instanceof Element && e.target.closest("button")) return;
-          setFlipped(f => !f);
-        }}
-        style={{ width: "100%", maxWidth: 520, height: word.arabicF ? "min(820px, 170vw)" : "min(520px, 110vw)", perspective: 1000, cursor: "pointer" }}
-      >
-        <div style={{
-          position: "relative", width: "100%", height: "100%",
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "100%",
           transformStyle: "preserve-3d",
           transition: "transform 0.55s",
           transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
-        }}>
-          {/* Front */}
-          <div style={{
-            position: "absolute", inset: 0, backfaceVisibility: "hidden",
-            borderRadius: 22,
-            background: isLearned
-              ? "linear-gradient(135deg, #166534 0%, #15803d 100%)"
-              : "var(--navy)",
-            display: "flex", flexDirection: "column", alignItems: "center",
-            justifyContent: "center", padding: 28, textAlign: "center", overflow: "auto",
-            boxShadow: isLearned ? "0 0 0 3px #4ade80" : "none",
-            transition: "background 0.4s, box-shadow 0.4s",
-          }}>
-            <ArabicForms word={word} tone="light" scale="hero" />
-            <span style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", fontWeight: 500, marginTop: 8 }}>tap card to reveal</span>
-          </div>
-
-          {/* Back */}
-          <div style={{
-            position: "absolute", inset: 0, backfaceVisibility: "hidden",
-            transform: "rotateY(180deg)", borderRadius: 22,
-            background: isLearned
-              ? "linear-gradient(135deg, #4ade80 0%, #22c55e 100%)"
-              : "var(--gold)",
-            display: "flex", flexDirection: "column", alignItems: "center",
-            justifyContent: "center", padding: 28, textAlign: "center", overflow: "auto",
-          }}>
-            <div style={{ fontSize: "clamp(22px,5vw,30px)", fontWeight: 800, color: "white", marginBottom: 10, lineHeight: 1.3 }}>{word.english}</div>
-            {word.example && (
-              <div style={{ padding: "10px 16px", borderRadius: 12, background: "rgba(255,255,255,0.3)", maxWidth: "100%" }}>
-                <ExampleForms word={word} tone="white" />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Mark learned / unlearned */}
-      <button
-        onClick={handleMark}
-        style={{
-          width: "100%", maxWidth: 400,
-          padding: "15px 0", borderRadius: 14,
-          fontSize: 18, fontWeight: 700, cursor: "pointer",
-          border: isLearned ? "3px solid #dc2626" : "3px solid #16a34a",
-          background: isLearned ? "rgba(220,38,38,0.08)" : "rgba(74,222,128,0.12)",
-          color: isLearned ? "#dc2626" : "#16a34a",
-          transition: "all 0.2s",
         }}
       >
-        {isLearned ? "🔄 Mark as unlearned" : "✅ I know this word!"}
-      </button>
-
-      {/* Prev / Next */}
-      <div style={{ display: "flex", gap: 14, width: "100%", maxWidth: 400 }}>
-        <button onClick={prev} disabled={index === 0} style={{
-          flex: 1, padding: "16px 0", borderRadius: 14, fontWeight: 700, fontSize: 18,
-          background: index === 0 ? "#e0ddd8" : "white",
-          color: index === 0 ? "#aaa" : "var(--navy)",
-          border: "3px solid " + (index === 0 ? "#e0ddd8" : "var(--navy)"),
-          cursor: index === 0 ? "not-allowed" : "pointer",
-        }}>← Prev</button>
-        <button onClick={next} disabled={index === total - 1} style={{
-          flex: 1, padding: "16px 0", borderRadius: 14, fontWeight: 700, fontSize: 18,
-          background: index === total - 1 ? "#e0ddd8" : "var(--navy)",
-          color: index === total - 1 ? "#aaa" : "white",
-          border: "3px solid " + (index === total - 1 ? "#e0ddd8" : "var(--navy)"),
-          cursor: index === total - 1 ? "not-allowed" : "pointer",
-        }}>Next →</button>
-      </div>
-
-      <span style={{ fontSize: 15, padding: "7px 18px", borderRadius: 99, background: "var(--navy)", color: "var(--gold-light)", fontWeight: 700 }}>
-        {word.category}
-      </span>
-    </div>
-  );
-}
-
-// ─── Progress summary ─────────────────────────────────────────────────────────
-function ProgressSummary({ total, learnedCount, onReset }: { total: number; learnedCount: number; onReset: () => void }) {
-  const pct = total > 0 ? Math.round((learnedCount / total) * 100) : 0;
-  const barColor = pct === 100 ? "#4ade80" : pct >= 50 ? "#facc15" : "var(--gold)";
-
-  return (
-    <div style={{
-      background: "white", borderRadius: 18, padding: "16px 20px", marginBottom: 20,
-      border: "2px solid var(--navy)", display: "flex", flexDirection: "column", gap: 10,
-    }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ fontSize: 16, fontWeight: 800, color: "var(--navy)" }}>
-          {pct === 100 ? "🎉 All learned!" : `📚 Progress: ${learnedCount}/${total} learned`}
-        </span>
-        {learnedCount > 0 && (
-          <button onClick={onReset} style={{
-            fontSize: 13, fontWeight: 600, color: "#dc2626",
-            background: "rgba(220,38,38,0.08)", border: "1.5px solid #dc2626",
-            borderRadius: 8, padding: "4px 10px", cursor: "pointer",
-          }}>
-            Reset all
-          </button>
-        )}
-      </div>
-      <div style={{ height: 12, borderRadius: 99, background: "#eee", overflow: "hidden" }}>
-        <div style={{ height: "100%", borderRadius: 99, background: barColor, width: `${pct}%`, transition: "width 0.5s ease" }} />
-      </div>
-      <div style={{ display: "flex", gap: 16, fontSize: 14, fontWeight: 600 }}>
-        <span style={{ color: "#16a34a" }}>✅ {learnedCount} learned</span>
-        <span style={{ color: "var(--navy)" }}>📖 {total - learnedCount} remaining</span>
-        <span style={{ color: "#888" }}>{pct}%</span>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backfaceVisibility: "hidden",
+            borderRadius: 22,
+            background: "var(--navy)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 28,
+            textAlign: "center",
+            overflow: "auto",
+          }}
+        >
+          <ArabicForms word={word} tone="light" scale="hero" />
+          <span style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", fontWeight: 500, marginTop: 8 }}>
+            tap card to reveal
+          </span>
+        </div>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backfaceVisibility: "hidden",
+            transform: "rotateY(180deg)",
+            borderRadius: 22,
+            background: "var(--gold)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 28,
+            textAlign: "center",
+            overflow: "auto",
+          }}
+        >
+          <div style={{ fontSize: "clamp(22px,5vw,30px)", fontWeight: 800, color: "white", marginBottom: 10, lineHeight: 1.3 }}>
+            {word.english}
+          </div>
+          {word.example && (
+            <div style={{ padding: "10px 16px", borderRadius: 12, background: "rgba(255,255,255,0.3)", maxWidth: "100%" }}>
+              <ExampleForms word={word} tone="white" />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
-export default function Flashcards() {
-  const [selectedCat, setSelectedCat] = useState("All");
-  const [filterMode, setFilterMode] = useState<FilterMode>("all");
-  const [index, setIndex] = useState(0);
-  const [mounted, setMounted] = useState(false);
+function FlashcardsInner() {
+  const searchParams = useSearchParams();
+  const initial = searchParams.get("category");
+  const validInitial = initial && categories.includes(initial) ? initial : "All";
+
   const { progress, correct, wrong, reset } = useProgress();
+  const [mode, setMode] = useState<Mode>("study");
+  const [selectedCat, setSelectedCat] = useState(validInitial);
+  const [queue, setQueue] = useState<Word[]>([]);
+  const [flipped, setFlipped] = useState(false);
+  const [browseIndex, setBrowseIndex] = useState(0);
+  const [ready, setReady] = useState(false);
+  const grading = useRef(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  const source = wordsIn(selectedCat);
 
-  const baseWords = selectedCat === "All" ? vocabulary : vocabulary.filter(w => w.category === selectedCat);
-  const isKnown = (w: Word) => getWordStatus(progress, w.id) === "known";
-  const words: Word[] =
-    filterMode === "unlearned" ? baseWords.filter(w => !isKnown(w)) :
-    filterMode === "learned"   ? baseWords.filter(w => isKnown(w)) :
-    baseWords;
+  useEffect(() => {
+    setQueue(buildStudyQueue(wordsIn(selectedCat), getProgress()));
+    setFlipped(false);
+    setBrowseIndex(0);
+    setReady(true);
+  }, [selectedCat]);
 
-  const safeIndex = Math.min(index, Math.max(0, words.length - 1));
+  const current = queue[0] ?? null;
+  const unseenLeft = source.filter((word) => !progress[String(word.id)]).length;
+  const waiting = waitingWords(source, progress);
+  const nextAt = nextScheduledReview(source, progress);
 
-  const handleCat = (cat: string) => { setSelectedCat(cat); setIndex(0); };
-  const handleFilter = (mode: FilterMode) => { setFilterMode(mode); setIndex(0); };
-
-  const markLearned = useCallback(() => {
-    const w = words[safeIndex];
-    if (!w) return;
-    correct(w.id);
-  }, [words, safeIndex, correct]);
-
-  const markUnlearned = useCallback(() => {
-    const w = words[safeIndex];
-    if (!w) return;
-    wrong(w.id);
-  }, [words, safeIndex, wrong]);
-
-  const resetAll = () => {
-    if (confirm("Reset all word progress? This cannot be undone.")) reset();
+  const startAnotherSet = () => {
+    setQueue(buildStudyQueue(source, getProgress()));
+    setFlipped(false);
+    setMode("study");
   };
 
-  const learnedInCat = baseWords.filter(w => isKnown(w)).length;
-  const unlearnedCount = baseWords.filter(w => !isKnown(w)).length;
+  useEffect(() => {
+    grading.current = false;
+  }, [current?.id, flipped]);
+
+  const grade = (ok: boolean) => {
+    if (!current || !flipped || grading.current) return;
+    grading.current = true;
+    if (ok) {
+      correct(current.id);
+      setQueue((cards) => cards.slice(1));
+    } else {
+      wrong(current.id);
+      setQueue((cards) => requeueAgain(cards));
+    }
+    setFlipped(false);
+  };
+
+  const resetAll = () => {
+    if (!confirm("Reset all word progress? This cannot be undone.")) return;
+    reset();
+    setQueue(buildStudyQueue(source, {}));
+    setFlipped(false);
+    setBrowseIndex(0);
+  };
+
+  const browseWord = source[browseIndex] ?? null;
 
   return (
     <div className="fade-in">
-      <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--navy)", marginBottom: 18 }}>Flashcards</h1>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--navy)", margin: 0 }}>Flashcards</h1>
+        {Object.keys(progress).length > 0 && (
+        <button
+          type="button"
+          onClick={resetAll}
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            color: "#dc2626",
+            background: "rgba(220,38,38,0.08)",
+            border: "1.5px solid #dc2626",
+            borderRadius: 8,
+            padding: "6px 12px",
+            cursor: "pointer",
+          }}
+        >
+          Reset all
+        </button>
+        )}
+      </div>
 
-      {/* Progress summary */}
-      {mounted && (
-        <ProgressSummary total={baseWords.length} learnedCount={learnedInCat} onReset={resetAll} />
-      )}
-
-      {/* Filter tabs: All / Still learning / Learned */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-        {([
-          { mode: "all" as FilterMode, label: `All (${baseWords.length})` },
-          { mode: "unlearned" as FilterMode, label: `🔁 Still learning (${unlearnedCount})` },
-          { mode: "learned" as FilterMode, label: `✅ Learned (${learnedInCat})` },
-        ]).map(({ mode, label }) => (
-          <button key={mode} onClick={() => handleFilter(mode)} style={{
-            padding: "9px 16px", borderRadius: 10, fontSize: 14, fontWeight: 700,
-            cursor: "pointer", whiteSpace: "nowrap",
-            background: filterMode === mode ? "var(--navy)" : "white",
-            color: filterMode === mode ? "white" : "var(--navy)",
-            border: "2px solid var(--navy)", transition: "all 0.15s",
-          }}>
-            {label}
+      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        {(["study", "browse"] as const).map((item) => (
+          <button
+            key={item}
+            type="button"
+            onClick={() => {
+              setMode(item);
+              setFlipped(false);
+            }}
+            style={{
+              padding: "10px 18px",
+              borderRadius: 10,
+              fontSize: 15,
+              fontWeight: 800,
+              cursor: "pointer",
+              background: mode === item ? "var(--navy)" : "white",
+              color: mode === item ? "white" : "var(--navy)",
+              border: "2px solid var(--navy)",
+            }}
+          >
+            {item === "study" ? "Study" : "Browse"}
           </button>
         ))}
       </div>
 
-      {/* Category pills */}
-      <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 10, marginBottom: 28, scrollbarWidth: "none" }}>
-        {["All", ...categories].map(cat => (
-          <button key={cat} onClick={() => handleCat(cat)} style={{
-            padding: "10px 20px", borderRadius: 99, fontSize: 15, fontWeight: 700,
-            cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
-            background: selectedCat === cat ? "var(--navy)" : "white",
-            color: selectedCat === cat ? "white" : "var(--navy)",
-            border: "2px solid var(--navy)",
-          }}>
-            {cat} ({cat === "All" ? vocabulary.length : vocabulary.filter(w => w.category === cat).length})
+      <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 10, marginBottom: 22, scrollbarWidth: "none" }}>
+        {["All", ...categories].map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setSelectedCat(cat)}
+            style={{
+              padding: "10px 20px",
+              borderRadius: 99,
+              fontSize: 15,
+              fontWeight: 700,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+              background: selectedCat === cat ? "var(--navy)" : "white",
+              color: selectedCat === cat ? "white" : "var(--navy)",
+              border: "2px solid var(--navy)",
+            }}
+          >
+            {cat} ({wordsIn(cat).length})
           </button>
         ))}
       </div>
 
-      {/* Card or empty state */}
-      {words.length === 0 ? (
+      {!ready ? (
+        <div style={{ padding: 24, fontWeight: 700, color: "var(--navy)" }}>Loading cards…</div>
+      ) : mode === "browse" ? (
+        browseWord ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
+            <div style={{ width: "100%", display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ flex: 1, height: 10, borderRadius: 99, background: "#ddd", overflow: "hidden" }}>
+                <div
+                  style={{
+                    height: 10,
+                    borderRadius: 99,
+                    background: "var(--gold)",
+                    width: `${((browseIndex + 1) / source.length) * 100}%`,
+                  }}
+                />
+              </div>
+              <span style={{ fontSize: 17, fontWeight: 700, color: "var(--navy)", minWidth: 56 }}>
+                {browseIndex + 1}/{source.length}
+              </span>
+            </div>
+            <FlipCard word={browseWord} flipped={flipped} onFlip={() => setFlipped((open) => !open)} />
+            <div style={{ display: "flex", gap: 14, width: "100%", maxWidth: 400 }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setFlipped(false);
+                  setBrowseIndex((i) => Math.max(0, i - 1));
+                }}
+                disabled={browseIndex === 0}
+                style={{
+                  flex: 1,
+                  padding: "16px 0",
+                  borderRadius: 14,
+                  fontWeight: 700,
+                  fontSize: 18,
+                  background: browseIndex === 0 ? "#e0ddd8" : "white",
+                  color: browseIndex === 0 ? "#aaa" : "var(--navy)",
+                  border: "3px solid " + (browseIndex === 0 ? "#e0ddd8" : "var(--navy)"),
+                  cursor: browseIndex === 0 ? "not-allowed" : "pointer",
+                }}
+              >
+                ← Prev
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setFlipped(false);
+                  setBrowseIndex((i) => Math.min(source.length - 1, i + 1));
+                }}
+                disabled={browseIndex >= source.length - 1}
+                style={{
+                  flex: 1,
+                  padding: "16px 0",
+                  borderRadius: 14,
+                  fontWeight: 700,
+                  fontSize: 18,
+                  background: browseIndex >= source.length - 1 ? "#e0ddd8" : "var(--navy)",
+                  color: browseIndex >= source.length - 1 ? "#aaa" : "white",
+                  border: "3px solid " + (browseIndex >= source.length - 1 ? "#e0ddd8" : "var(--navy)"),
+                  cursor: browseIndex >= source.length - 1 ? "not-allowed" : "pointer",
+                }}
+              >
+                Next →
+              </button>
+            </div>
+            <span style={{ fontSize: 15, padding: "7px 18px", borderRadius: 99, background: "var(--navy)", color: "var(--gold-light)", fontWeight: 700 }}>
+              {browseWord.category}
+            </span>
+          </div>
+        ) : (
+          <div style={{ textAlign: "center", padding: 32, color: "#555" }}>No words in this category.</div>
+        )
+      ) : !current ? (
         <div style={{ textAlign: "center", padding: "48px 24px", background: "white", borderRadius: 22, border: "2px solid var(--navy)" }}>
-          {filterMode === "unlearned" ? (
-            <>
-              <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "var(--navy)", marginBottom: 10 }}>
-                You&apos;ve learned all these words!
-              </div>
-              <p style={{ fontSize: 16, color: "#666", marginBottom: 20 }}>
-                All {baseWords.length} words in this category are marked as learned.
-              </p>
-              <button onClick={() => handleFilter("all")} style={{
-                padding: "13px 28px", borderRadius: 12, fontSize: 17, fontWeight: 700,
-                background: "var(--navy)", color: "white", border: "none", cursor: "pointer",
-              }}>
-                Review all words anyway
-              </button>
-            </>
-          ) : filterMode === "learned" ? (
-            <>
-              <div style={{ fontSize: 56, marginBottom: 16 }}>📖</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "var(--navy)", marginBottom: 10 }}>
-                No learned words yet
-              </div>
-              <p style={{ fontSize: 16, color: "#666", marginBottom: 20 }}>
-                Tap &quot;✅ I know this word!&quot; on cards you&apos;ve mastered.
-              </p>
-              <button onClick={() => handleFilter("all")} style={{
-                padding: "13px 28px", borderRadius: 12, fontSize: 17, fontWeight: 700,
-                background: "var(--navy)", color: "white", border: "none", cursor: "pointer",
-              }}>
-                Start studying
-              </button>
-            </>
-          ) : (
-            <div style={{ fontSize: 18, color: "#666" }}>No words found.</div>
+          <div style={{ fontSize: 56, marginBottom: 12 }}>✨</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "var(--navy)", marginBottom: 8 }}>You&apos;re caught up</div>
+          <p style={{ fontSize: 17, color: "#444", margin: "0 0 8px" }}>
+            {waiting.length === 0
+              ? "No words are waiting for review."
+              : `${waiting.length} word${waiting.length === 1 ? "" : "s"} waiting`}
+          </p>
+          {nextAt !== null && (
+            <p style={{ fontSize: 17, fontWeight: 700, color: "var(--navy)", margin: "0 0 18px" }}>
+              Next review {formatWait(nextAt, Date.now())}
+            </p>
           )}
+          {unseenLeft > 0 && (
+            <p style={{ fontSize: 16, color: "#555", margin: "0 0 18px" }}>
+              {unseenLeft} new word{unseenLeft === 1 ? "" : "s"} left for a later set.
+            </p>
+          )}
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+            {unseenLeft > 0 && (
+              <button
+                type="button"
+                onClick={startAnotherSet}
+                style={{
+                  padding: "14px 22px",
+                  borderRadius: 12,
+                  fontSize: 17,
+                  fontWeight: 800,
+                  background: "var(--navy)",
+                  color: "white",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Study 10 more
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setMode("browse");
+                setFlipped(false);
+              }}
+              style={{
+                padding: "14px 22px",
+                borderRadius: 12,
+                fontSize: 17,
+                fontWeight: 800,
+                background: "white",
+                color: "var(--navy)",
+                border: "3px solid var(--navy)",
+                cursor: "pointer",
+              }}
+            >
+              Browse words
+            </button>
+          </div>
         </div>
       ) : (
-        <FlashCard
-          word={words[safeIndex]}
-          index={safeIndex}
-          total={words.length}
-          isLearned={isKnown(words[safeIndex]!)}
-          onMarkLearned={markLearned}
-          onMarkUnlearned={markUnlearned}
-          onNext={() => setIndex(i => Math.min(i + 1, words.length - 1))}
-          onPrev={() => setIndex(i => Math.max(i - 1, 0))}
-        />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
+          <div style={{ width: "100%", fontSize: 17, fontWeight: 800, color: "var(--navy)" }}>
+            {queue.length} left
+            {selectedCat !== "All" ? ` · ${selectedCat}` : ""}
+          </div>
+          <FlipCard key={current.id} word={current} flipped={flipped} onFlip={() => setFlipped((open) => !open)} />
+          {flipped ? (
+            <div style={{ display: "flex", gap: 14, width: "100%", maxWidth: 400 }}>
+              <button
+                type="button"
+                onClick={() => grade(false)}
+                style={{
+                  flex: 1,
+                  padding: "16px 0",
+                  borderRadius: 14,
+                  fontWeight: 800,
+                  fontSize: 18,
+                  background: "rgba(220,38,38,0.08)",
+                  color: "#dc2626",
+                  border: "3px solid #dc2626",
+                  cursor: "pointer",
+                }}
+              >
+                Again
+              </button>
+              <button
+                type="button"
+                onClick={() => grade(true)}
+                style={{
+                  flex: 1,
+                  padding: "16px 0",
+                  borderRadius: 14,
+                  fontWeight: 800,
+                  fontSize: 18,
+                  background: "rgba(22,163,74,0.12)",
+                  color: "#16a34a",
+                  border: "3px solid #16a34a",
+                  cursor: "pointer",
+                }}
+              >
+                Got it
+              </button>
+            </div>
+          ) : (
+            <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#666" }}>
+              Recall the meaning, then tap the card.
+            </p>
+          )}
+          <span style={{ fontSize: 15, padding: "7px 18px", borderRadius: 99, background: "var(--navy)", color: "var(--gold-light)", fontWeight: 700 }}>
+            {current.category}
+          </span>
+        </div>
       )}
     </div>
   );
 }
 
+export default function Flashcards() {
+  return (
+    <Suspense fallback={<div className="fade-in" style={{ padding: 24, fontWeight: 700, color: "var(--navy)" }}>Loading cards…</div>}>
+      <FlashcardsInner />
+    </Suspense>
+  );
+}
