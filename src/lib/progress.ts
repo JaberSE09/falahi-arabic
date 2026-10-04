@@ -17,17 +17,17 @@ export type ProgressFilter = "all" | "learning" | "known";
 const STORAGE_KEY = "falahi-word-progress";
 const LEGACY_LEARNED_KEY = "falahi_learned_v1";
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 const LEARNING_INTERVALS_MS = [
   10 * 60 * 1000,
-  24 * 60 * 60 * 1000,
-  3 * 24 * 60 * 60 * 1000,
+  DAY_MS,
+  3 * DAY_MS,
 ];
 
-const KNOWN_INTERVALS_MS = [
-  3 * 24 * 60 * 60 * 1000,
-  7 * 24 * 60 * 60 * 1000,
-  14 * 24 * 60 * 60 * 1000,
-];
+const KNOWN_INTERVALS_MS = [3, 7, 21, 45, 90].map((days) => days * DAY_MS);
+
+export const NEW_WORDS_PER_SESSION = 10;
 
 export function shuffle<T>(arr: T[]): T[] {
   return [...arr].sort(() => Math.random() - 0.5);
@@ -198,6 +198,35 @@ export function getDueWords(words: Word[], progress: ProgressMap, now = Date.now
     if (!entry) return false;
     return entry.nextReview <= now;
   });
+}
+
+/** Due words first, then up to 10 unseen. Words scheduled for later stay out. */
+export function buildStudyQueue(
+  words: Word[],
+  progress: ProgressMap,
+  now = Date.now(),
+  newLimit = NEW_WORDS_PER_SESSION,
+): Word[] {
+  const due = shuffle(getDueWords(words, progress, now));
+  const unseen = shuffle(words.filter((word) => !progress[String(word.id)])).slice(0, newLimit);
+  return [...due, ...unseen];
+}
+
+export function waitingWords(words: Word[], progress: ProgressMap, now = Date.now()): Word[] {
+  return words.filter((word) => {
+    const entry = progress[String(word.id)];
+    return !!entry && entry.nextReview > now;
+  });
+}
+
+export function nextScheduledReview(words: Word[], progress: ProgressMap, now = Date.now()): number | null {
+  let soonest: number | null = null;
+  for (const word of waitingWords(words, progress, now)) {
+    const at = progress[String(word.id)]?.nextReview;
+    if (at === undefined) continue;
+    if (soonest === null || at < soonest) soonest = at;
+  }
+  return soonest;
 }
 
 export function countStatus(progress: ProgressMap, total: number, now = Date.now()) {
