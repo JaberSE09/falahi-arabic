@@ -19,7 +19,7 @@ export default function SurahPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [openAyahs, setOpenAyahs] = useState<Set<number>>(new Set());
-  const [fontSize, setFontSize] = useState(38);
+  const [fontSize, setFontSize] = useState(60);
 
   useEffect(() => {
     if (!surahNum || isNaN(surahNum)) return;
@@ -121,7 +121,7 @@ export default function SurahPage() {
         {/* Bismillah (not for At-Tawbah #9, and Al-Fatihah starts with it already) */}
         {surahNum !== 9 && surahNum !== 1 && (
           <div style={{ textAlign: "center", padding: "20px 0 16px", borderBottom: "1px solid #1f2937", marginBottom: 8 }}>
-            <p dir="rtl" style={{ fontFamily: "serif", fontSize: Math.min(fontSize, 36), color: "#86efac", margin: "0 0 8px", lineHeight: 1.8 }}>
+            <p dir="rtl" style={{ fontFamily: "serif", fontSize: fontSize, color: "#86efac", margin: "0 0 8px", lineHeight: 1.8 }}>
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </p>
             <p style={{ color: "#6b7280", fontSize: 13, fontStyle: "italic", margin: "0 0 4px" }}>
