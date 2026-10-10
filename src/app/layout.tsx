@@ -19,6 +19,11 @@ const arabic = Scheherazade_New({
 export const metadata: Metadata = {
   title: "Falahi Arabic — Learn Palestinian & Islamic Arabic",
   description: "Interactive flashcards, phrases, Quran, duas, and hadith to learn Palestinian and Quranic Arabic.",
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: { index: false, follow: false },
+  },
 };
 
 export const viewport: Viewport = {
