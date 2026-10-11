@@ -29,10 +29,10 @@ export default function QuranPage() {
   return (
     <div className="fade-in">
       <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--navy)", marginBottom: 8 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: "#f3f4f6", marginBottom: 8 }}>
           Quran
         </h1>
-        <p style={{ color: "#555", fontSize: 16, lineHeight: 1.5, margin: 0 }}>
+        <p style={{ color: "#d1d5db", fontSize: 16, lineHeight: 1.5, margin: 0 }}>
           Learn short surahs <strong>line by line</strong> — listen, recall, chain ayahs, then review.
         </p>
       </div>
@@ -64,7 +64,7 @@ export default function QuranPage() {
           <div
             style={{
               borderRadius: 18,
-              background: "var(--navy)",
+              background: "#1A2F5A",
               color: "white",
               padding: "22px 24px",
               marginBottom: 20,
@@ -108,22 +108,22 @@ export default function QuranPage() {
                 style={{
                   display: "block",
                   textDecoration: "none",
-                  background: "white",
+                  background: "#111827",
                   borderRadius: 16,
                   padding: "16px 18px",
-                  border: "2px solid #e8e0d0",
+                  border: "2px solid #1f2937",
                   color: "inherit",
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#888", marginBottom: 4 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>
                       #{surah.order} · Surah {surah.number} · {surah.ayahCount} lines
                     </div>
-                    <div className="arabic arabic-read" style={{ color: "var(--navy)" }}>
+                    <div className="arabic arabic-read" style={{ color: "#f3f4f6" }}>
                       {surah.nameAr}
                     </div>
-                    <div style={{ fontWeight: 800, color: "var(--navy)", fontSize: 17 }}>{surah.nameEn}</div>
+                    <div style={{ fontWeight: 800, color: "#f3f4f6", fontSize: 17 }}>{surah.nameEn}</div>
                   </div>
                   <div style={{ textAlign: "right", minWidth: 72 }}>
                     <div style={{ fontWeight: 900, fontSize: 22, color: "var(--gold)" }}>{summary.percent}%</div>
@@ -131,7 +131,7 @@ export default function QuranPage() {
                       <div style={{ fontSize: 12, fontWeight: 700, color: "#e85d75" }}>Due {summary.due}</div>
                     )}
                     {summary.percent < 100 && summary.due === 0 && (
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "#666" }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#9ca3af" }}>
                         Line {summary.nextAyah}
                       </div>
                     )}
@@ -142,7 +142,7 @@ export default function QuranPage() {
                     marginTop: 12,
                     height: 6,
                     borderRadius: 99,
-                    background: "#eee",
+                    background: "#374151",
                     overflow: "hidden",
                   }}
                 >
@@ -166,9 +166,9 @@ export default function QuranPage() {
               marginTop: 8,
               padding: "10px 16px",
               borderRadius: 10,
-              border: "2px solid #ddd",
-              background: "white",
-              color: "var(--navy)",
+              border: "2px solid #1f2937",
+              background: "#111827",
+              color: "#f3f4f6",
               fontWeight: 800,
               cursor: "pointer",
               fontSize: 14,
@@ -180,7 +180,7 @@ export default function QuranPage() {
           {showVerses && (
         <>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, margin: "20px 0 12px" }}>
-            <p style={{ color: "#666", fontSize: 15, margin: 0 }}>
+            <p style={{ color: "#9ca3af", fontSize: 15, margin: 0 }}>
               Key ayahs for meaning and reflection (not full surahs).
             </p>
             <div style={{ display: "flex", gap: 8 }}>
@@ -195,7 +195,7 @@ export default function QuranPage() {
                     fontWeight: 600,
                     fontSize: 14,
                     cursor: "pointer",
-                    background: view === v ? "var(--navy)" : "white",
+                    background: view === v ? "#1A2F5A" : "#111827",
                     color: view === v ? "white" : "var(--navy)",
                     border: "2px solid var(--navy)",
                   }}
@@ -218,7 +218,7 @@ export default function QuranPage() {
                   fontSize: 12,
                   fontWeight: 500,
                   cursor: "pointer",
-                  background: filterTopic === t ? "var(--gold)" : "white",
+                  background: filterTopic === t ? "var(--gold)" : "#111827",
                   color: filterTopic === t ? "var(--navy)" : "#555",
                   border: "2px solid " + (filterTopic === t ? "var(--gold)" : "#ddd"),
                 }}
@@ -236,10 +236,10 @@ export default function QuranPage() {
                 <div
                   key={v.id}
                   style={{
-                    background: "white",
+                    background: "#111827",
                     borderRadius: 16,
                     padding: "20px 24px",
-                    border: "1px solid #e8e0d0",
+                    border: "1px solid #1f2937",
                     boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                   }}
                 >
@@ -251,7 +251,7 @@ export default function QuranPage() {
                           fontWeight: 700,
                           padding: "3px 10px",
                           borderRadius: 999,
-                          background: "var(--navy)",
+                          background: "#1A2F5A",
                           color: "var(--gold-light)",
                         }}
                       >
@@ -263,8 +263,8 @@ export default function QuranPage() {
                           fontWeight: 600,
                           padding: "3px 10px",
                           borderRadius: 999,
-                          background: "#f0ebe0",
-                          color: "var(--navy)",
+                          background: "#1f2937",
+                          color: "#f3f4f6",
                         }}
                       >
                         {v.topic}
@@ -275,7 +275,7 @@ export default function QuranPage() {
                   <div
                     className="arabic arabic-read"
                     style={{
-                      color: "var(--navy)",
+                      color: "#f3f4f6",
                       textAlign: "right",
                       marginBottom: 12,
                       fontWeight: 400,
@@ -286,15 +286,15 @@ export default function QuranPage() {
                   <div style={{ fontSize: 17, fontStyle: "italic", color: "var(--gold)", marginBottom: 6 }}>
                     {v.transliteration}
                   </div>
-                  <div style={{ fontSize: 17, color: "#222" }}>{v.english}</div>
+                  <div style={{ fontSize: 17, color: "#f3f4f6" }}>{v.english}</div>
                   {v.note && (
                     <div
                       style={{
                         marginTop: 10,
                         fontSize: 12,
-                        color: "#888",
+                        color: "#9ca3af",
                         padding: "6px 12px",
-                        background: "#f9f6f0",
+                        background: "#1f2937",
                         borderRadius: 8,
                       }}
                     >
