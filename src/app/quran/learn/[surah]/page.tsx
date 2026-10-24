@@ -52,7 +52,7 @@ export default function QuranSurahLearnPage() {
   if (!surah) {
     return (
       <div className="fade-in" style={{ padding: 24, textAlign: "center" }}>
-        <p style={{ marginBottom: 16, fontWeight: 700, color: "var(--navy)" }}>Surah not found.</p>
+        <p style={{ marginBottom: 16, fontWeight: 700, color: "#f3f4f6" }}>Surah not found.</p>
         <Link href="/quran/learn" style={{ color: "var(--gold)", fontWeight: 800 }}>
           ← Back to Learn Surahs
         </Link>
@@ -97,23 +97,23 @@ export default function QuranSurahLearnPage() {
 
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 8 }}>
         <div>
-          <div className="arabic arabic-read" style={{ color: "var(--navy)" }}>
+          <div className="arabic arabic-read" style={{ color: "#f3f4f6" }}>
             {surah.nameAr}
           </div>
-          <div style={{ fontWeight: 800, fontSize: 20, color: "var(--navy)" }}>
+          <div style={{ fontWeight: 800, fontSize: 20, color: "#f3f4f6" }}>
             {surah.nameEn}{" "}
-            <span style={{ color: "#888", fontWeight: 600, fontSize: 15 }}>({surah.number})</span>
+            <span style={{ color: "#9ca3af", fontWeight: 600, fontSize: 15 }}>({surah.number})</span>
           </div>
         </div>
-        <div style={{ textAlign: "right", fontWeight: 700, color: "var(--navy)" }}>
+        <div style={{ textAlign: "right", fontWeight: 700, color: "#f3f4f6" }}>
           <div style={{ fontSize: 22 }}>{summary?.percent ?? 0}%</div>
-          <div style={{ fontSize: 13, color: "#666" }}>
+          <div style={{ fontSize: 13, color: "#9ca3af" }}>
             Line {ayah.ayah} / {surah.ayahCount}
           </div>
         </div>
       </div>
 
-      <div style={{ height: 8, borderRadius: 99, background: "#eee", overflow: "hidden", marginBottom: 20 }}>
+      <div style={{ height: 8, borderRadius: 99, background: "#374151", overflow: "hidden", marginBottom: 20 }}>
         <div
           style={{
             width: `${((idx + 1) / surah.ayahCount) * 100}%`,
@@ -133,7 +133,7 @@ export default function QuranSurahLearnPage() {
             marginBottom: 16,
             padding: "12px 16px",
             borderRadius: 12,
-            border: "2px solid #e85d75",
+            border: "2px solid #1f2937",
             background: "rgba(232,93,117,0.08)",
             color: "#e85d75",
             fontWeight: 800,
@@ -151,15 +151,15 @@ export default function QuranSurahLearnPage() {
             textAlign: "center",
             padding: "40px 24px",
             borderRadius: 20,
-            background: "white",
-            border: "2px solid #e8e0d0",
+            background: "#111827",
+            border: "2px solid #1f2937",
           }}
         >
           <div style={{ fontSize: 40, marginBottom: 12 }}>✨</div>
-          <div style={{ fontWeight: 900, fontSize: 24, color: "var(--navy)", marginBottom: 8 }}>
+          <div style={{ fontWeight: 900, fontSize: 24, color: "#f3f4f6", marginBottom: 8 }}>
             Surah complete for now
           </div>
-          <p style={{ color: "#555", marginBottom: 20, lineHeight: 1.5 }}>
+          <p style={{ color: "#d1d5db", marginBottom: 20, lineHeight: 1.5 }}>
             Come back for due reviews so the lines stay with you.
           </p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
@@ -168,7 +168,7 @@ export default function QuranSurahLearnPage() {
               style={{
                 padding: "12px 20px",
                 borderRadius: 12,
-                background: "var(--navy)",
+                background: "#1A2F5A",
                 color: "white",
                 fontWeight: 800,
                 textDecoration: "none",
@@ -182,8 +182,8 @@ export default function QuranSurahLearnPage() {
               style={{
                 padding: "12px 20px",
                 borderRadius: 12,
-                background: "white",
-                color: "var(--navy)",
+                background: "#111827",
+                color: "#f3f4f6",
                 fontWeight: 800,
                 border: "2px solid var(--navy)",
                 cursor: "pointer",
@@ -197,16 +197,16 @@ export default function QuranSurahLearnPage() {
         <div
           style={{
             borderRadius: 20,
-            background: "white",
+            background: "#111827",
             border: "2px solid var(--navy)",
             padding: "24px 20px",
             marginBottom: 20,
           }}
         >
-          <div style={{ fontWeight: 900, fontSize: 18, color: "var(--navy)", marginBottom: 8 }}>
+          <div style={{ fontWeight: 900, fontSize: 18, color: "#f3f4f6", marginBottom: 8 }}>
             Chain check — recite ayah 1 → {ayah.ayah}
           </div>
-          <p style={{ color: "#555", marginBottom: 16, fontSize: 15, lineHeight: 1.5 }}>
+          <p style={{ color: "#d1d5db", marginBottom: 16, fontSize: 15, lineHeight: 1.5 }}>
             Recite from memory. Peek only if you need a line, then mark Done.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
@@ -218,11 +218,11 @@ export default function QuranSurahLearnPage() {
                 style={{
                   padding: "12px 14px",
                   borderRadius: 12,
-                  background: "#f9f6f0",
-                  border: "1px solid #e8e0d0",
+                  background: "#1f2937",
+                  border: "1px solid #1f2937",
                 }}
               >
-                <div style={{ fontSize: 12, fontWeight: 800, color: "#888", marginBottom: 6 }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "#9ca3af", marginBottom: 6 }}>
                   {surah.nameEn} {a.ayah}
                 </div>
                 {open ? (
@@ -230,7 +230,7 @@ export default function QuranSurahLearnPage() {
                     <div
                       className="arabic arabic-read"
                       style={{
-                        color: "var(--navy)",
+                        color: "#f3f4f6",
                         textAlign: "right",
                         marginBottom: 8,
                       }}
@@ -247,8 +247,8 @@ export default function QuranSurahLearnPage() {
                       padding: "8px 14px",
                       borderRadius: 10,
                       border: "2px solid var(--navy)",
-                      background: "white",
-                      color: "var(--navy)",
+                      background: "#111827",
+                      color: "#f3f4f6",
                       fontWeight: 800,
                       cursor: "pointer",
                     }}
@@ -290,8 +290,8 @@ export default function QuranSurahLearnPage() {
               style={{
                 padding: "14px 22px",
                 borderRadius: 12,
-                background: "white",
-                color: "var(--navy)",
+                background: "#111827",
+                color: "#f3f4f6",
                 fontWeight: 800,
                 border: "2px solid var(--navy)",
                 cursor: "pointer",
@@ -307,7 +307,7 @@ export default function QuranSurahLearnPage() {
           <div
             style={{
               borderRadius: 22,
-              background: "var(--navy)",
+              background: "#1A2F5A",
               padding: "28px 22px",
               marginBottom: 16,
               textAlign: "center",
@@ -365,10 +365,10 @@ export default function QuranSurahLearnPage() {
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontWeight: 800, color: "var(--navy)", marginBottom: 10, fontSize: 16 }}>
+            <div style={{ fontWeight: 800, color: "#f3f4f6", marginBottom: 10, fontSize: 16 }}>
               Say it — tap the mic and recite this line
             </div>
-            <p style={{ color: "#666", fontSize: 14, margin: "0 0 12px", lineHeight: 1.4 }}>
+            <p style={{ color: "#9ca3af", fontSize: 14, margin: "0 0 12px", lineHeight: 1.4 }}>
               After you speak, you&apos;ll hear and see <strong>Correct</strong> or <strong>Incorrect</strong>.
             </p>
             <PronounceButton
@@ -376,6 +376,7 @@ export default function QuranSurahLearnPage() {
               targetArabic={ayah.arabic}
               targetTransliteration={ayah.transliteration}
               size="lg"
+              dark
               onResult={(ok) => {
                 if (ok) {
                   correct(surah.number, ayah.ayah);
@@ -415,10 +416,10 @@ export default function QuranSurahLearnPage() {
                 style={{
                   padding: "14px 20px",
                   borderRadius: 12,
-                  background: "white",
-                  color: "var(--navy)",
+                  background: "#111827",
+                  color: "#f3f4f6",
                   fontWeight: 800,
-                  border: "2px solid #ddd",
+                  border: "2px solid #1f2937",
                   cursor: "pointer",
                   fontSize: 15,
                 }}
@@ -456,10 +457,10 @@ export default function QuranSurahLearnPage() {
                 style={{
                   padding: "14px 20px",
                   borderRadius: 12,
-                  background: "white",
+                  background: "#111827",
                   color: "#e85d75",
                   fontWeight: 800,
-                  border: "2px solid #e85d75",
+                  border: "2px solid #1f2937",
                   cursor: "pointer",
                   fontSize: 15,
                 }}
@@ -477,12 +478,12 @@ export default function QuranSurahLearnPage() {
               style={{
                 padding: "10px 16px",
                 borderRadius: 10,
-                border: "2px solid #ddd",
-                background: "white",
+                border: "2px solid #1f2937",
+                background: "#111827",
                 fontWeight: 700,
                 cursor: idx === 0 ? "not-allowed" : "pointer",
                 opacity: idx === 0 ? 0.4 : 1,
-                color: "var(--navy)",
+                color: "#f3f4f6",
               }}
             >
               ← Prev line
@@ -494,12 +495,12 @@ export default function QuranSurahLearnPage() {
               style={{
                 padding: "10px 16px",
                 borderRadius: 10,
-                border: "2px solid #ddd",
-                background: "white",
+                border: "2px solid #1f2937",
+                background: "#111827",
                 fontWeight: 700,
                 cursor: isLast ? "not-allowed" : "pointer",
                 opacity: isLast ? 0.4 : 1,
-                color: "var(--navy)",
+                color: "#f3f4f6",
               }}
             >
               Next line →

@@ -13,8 +13,8 @@ export default function QuranLearnListPage() {
           ← Quran hub
         </Link>
       </div>
-      <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--navy)", marginBottom: 8 }}>Learn Surahs</h1>
-      <p style={{ color: "#555", fontSize: 16, lineHeight: 1.5, marginBottom: 20 }}>
+      <h1 style={{ fontSize: 28, fontWeight: 800, color: "#f3f4f6", marginBottom: 8 }}>Learn Surahs</h1>
+      <p style={{ color: "#d1d5db", fontSize: 16, lineHeight: 1.5, marginBottom: 20 }}>
         Beginner path: shortest Juz Amma surahs first, then Al-Fatiha. Learn one line, then chain 1→N.
       </p>
 
@@ -25,7 +25,7 @@ export default function QuranLearnListPage() {
           flexWrap: "wrap",
           marginBottom: 20,
           fontWeight: 700,
-          color: "var(--navy)",
+          color: "#f3f4f6",
           fontSize: 15,
         }}
       >
@@ -48,24 +48,24 @@ export default function QuranLearnListPage() {
             style={{
               display: "block",
               textDecoration: "none",
-              background: "white",
+              background: "#111827",
               borderRadius: 16,
               padding: "18px 20px",
-              border: "2px solid #e8e0d0",
+              border: "2px solid #1f2937",
               color: "inherit",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 800, color: "#888", letterSpacing: 0.4, marginBottom: 6 }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "#9ca3af", letterSpacing: 0.4, marginBottom: 6 }}>
                   STEP {surah.order} · {surah.ayahCount} AYAH LINES
                 </div>
-                <div className="arabic arabic-read" style={{ color: "var(--navy)", marginBottom: 4 }}>
+                <div className="arabic arabic-read" style={{ color: "#f3f4f6", marginBottom: 4 }}>
                   {surah.nameAr}
                 </div>
-                <div style={{ fontWeight: 800, fontSize: 18, color: "var(--navy)" }}>
+                <div style={{ fontWeight: 800, fontSize: 18, color: "#f3f4f6" }}>
                   {surah.nameEn}{" "}
-                  <span style={{ fontWeight: 600, color: "#888", fontSize: 15 }}>({surah.number})</span>
+                  <span style={{ fontWeight: 600, color: "#9ca3af", fontSize: 15 }}>({surah.number})</span>
                 </div>
               </div>
               <div style={{ textAlign: "right" }}>
@@ -75,13 +75,13 @@ export default function QuranLearnListPage() {
                 {summary.due > 0 ? (
                   <div style={{ fontSize: 13, fontWeight: 800, color: "#e85d75" }}>Due {summary.due}</div>
                 ) : summary.percent < 100 ? (
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#666" }}>Start line {summary.nextAyah}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#9ca3af" }}>Start line {summary.nextAyah}</div>
                 ) : (
                   <div style={{ fontSize: 13, fontWeight: 800, color: "#2D7A4F" }}>Complete</div>
                 )}
               </div>
             </div>
-            <div style={{ marginTop: 14, height: 8, borderRadius: 99, background: "#eee", overflow: "hidden" }}>
+            <div style={{ marginTop: 14, height: 8, borderRadius: 99, background: "#374151", overflow: "hidden" }}>
               <div
                 style={{
                   width: `${summary.percent}%`,
@@ -105,9 +105,9 @@ export default function QuranLearnListPage() {
         style={{
           padding: "10px 16px",
           borderRadius: 10,
-          border: "2px solid #ddd",
-          background: "white",
-          color: "#888",
+          border: "2px solid #1f2937",
+          background: "#111827",
+          color: "#9ca3af",
           fontWeight: 700,
           cursor: "pointer",
           fontSize: 14,

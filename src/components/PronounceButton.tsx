@@ -25,6 +25,8 @@ interface PronounceButtonProps {
   targetTransliteration?: string;
   onResult?: (ok: boolean, heard: string) => void;
   size?: "md" | "lg";
+  /** Dark theme (used inside the Quran section). Default: light. */
+  dark?: boolean;
 }
 
 function normalizeLatin(text: string): string {
@@ -86,6 +88,7 @@ export default function PronounceButton({
   targetTransliteration,
   onResult,
   size = "lg",
+  dark = false,
 }: PronounceButtonProps) {
   const [feedback, setFeedback] = useState<Feedback>("idle");
   const [heard, setHeard] = useState("");
@@ -266,10 +269,10 @@ export default function PronounceButton({
         alignItems: "center",
         gap: 12,
         width: "100%",
-        background: "white",
+        background: dark ? "#111827" : "white",
         borderRadius: 16,
         padding: "18px 16px",
-        border: "2px solid #e8e0d0",
+        border: dark ? "2px solid #1f2937" : "2px solid #e8e0d0",
       }}
     >
       <button
@@ -294,8 +297,8 @@ export default function PronounceButton({
                 ? "#2D7A4F"
                 : feedback === "wrong" || feedback === "error" || feedback === "nohear"
                   ? "#e85d75"
-                  : "var(--navy)",
-          color: "white",
+                  : dark ? "var(--gold)" : "var(--navy)",
+          color: dark && feedback === "idle" ? "#0D1117" : "white",
           boxShadow: feedback === "listening" ? "0 0 0 8px rgba(201,150,58,0.25)" : "none",
         }}
       >
@@ -319,7 +322,7 @@ export default function PronounceButton({
               ? "#2D7A4F"
               : feedback === "wrong" || feedback === "nohear"
                 ? "#e85d75"
-                : "var(--navy)",
+                : dark ? "#f3f4f6" : "var(--navy)",
           textAlign: "center",
         }}
       >
@@ -351,7 +354,7 @@ export default function PronounceButton({
           >
             {feedback === "right" ? "Correct!" : "Incorrect"}
           </div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "#555", marginBottom: feedback === "wrong" ? 12 : 0 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: dark ? "#d1d5db" : "#555", marginBottom: feedback === "wrong" ? 12 : 0 }}>
             {feedback === "right" ? "You said it right." : "Not a match — try again."}
           </div>
           {feedback === "wrong" && (
@@ -365,25 +368,25 @@ export default function PronounceButton({
               }}
             >
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#666", marginBottom: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: dark ? "#9ca3af" : "#666", marginBottom: 4 }}>
                   Heard
                 </div>
-                <div className="arabic arabic-read" style={{ color: "var(--navy)" }}>
+                <div className="arabic arabic-read" style={{ color: dark ? "#f3f4f6" : "var(--navy)" }}>
                   {heard || "—"}
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#666", marginBottom: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: dark ? "#9ca3af" : "#666", marginBottom: 4 }}>
                   Expected
                 </div>
-                <div className="arabic arabic-read" style={{ color: "var(--navy)" }}>
+                <div className="arabic arabic-read" style={{ color: dark ? "#f3f4f6" : "var(--navy)" }}>
                   {targetArabic}
                 </div>
               </div>
             </div>
           )}
           {feedback === "right" && heard && (
-            <div style={{ marginTop: 8, fontSize: 15, color: "#555" }}>
+            <div style={{ marginTop: 8, fontSize: 15, color: dark ? "#d1d5db" : "#555" }}>
               Heard: <span className="arabic arabic-inline">{heard}</span>
             </div>
           )}
@@ -403,11 +406,11 @@ export default function PronounceButton({
             marginTop: 4,
             padding: "10px 18px",
             borderRadius: 10,
-            border: "2px solid var(--navy)",
-            background: "white",
+            border: dark ? "2px solid #4b5563" : "2px solid var(--navy)",
+            background: dark ? "#111827" : "white",
             fontWeight: 700,
             cursor: "pointer",
-            color: "var(--navy)",
+            color: dark ? "#f3f4f6" : "var(--navy)",
           }}
         >
           Try again
